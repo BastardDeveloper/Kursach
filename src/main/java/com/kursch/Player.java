@@ -43,9 +43,14 @@ public class Player {
             playerSprite.translateY(speed);
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
             playerSprite.translateY(-speed);
+
+        // незя в лево право
         playerSprite.setX(MathUtils.clamp(playerSprite.getX(), 0,
                 viewport.getWorldWidth() - playerSprite.getWidth()));
 
+        // незя верх в низ
+        playerSprite.setY(MathUtils.clamp(playerSprite.getY(), 0,
+                viewport.getWorldHeight() - playerSprite.getHeight()));
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE))
             shoot();
 
@@ -57,8 +62,8 @@ public class Player {
 
     private void shoot() {
         Sprite bulletSprite = new Sprite(bulletTexture);
-        bulletSprite.setSize(20, 50);
-        float startX = (playerSprite.getX() + (playerSprite.getWidth() - bulletSprite.getWidth()) / 2) - 7;
+        bulletSprite.setSize(12, 27);
+        float startX = (playerSprite.getX() + (playerSprite.getWidth() - bulletSprite.getWidth()) / 2) - 4;
         float startY = playerSprite.getY() + playerSprite.getHeight();
         bullets.add(new Bullet(bulletSprite, startX, startY));
     }

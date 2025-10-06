@@ -59,9 +59,9 @@ public class EnemyManager {
     }
 
     public void draw(SpriteBatch batch) {
-        // if (enemies.size == 0) {
-        // spawnWave();
-        // }
+        if (enemies.size == 0) {
+            spawnWave();
+        }
 
         for (Enemy e : enemies)
             e.draw(batch);
