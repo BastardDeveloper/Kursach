@@ -25,8 +25,8 @@ public class Enemy {
         time += delta;
         Vector2 newPos = pattern.getPosition(time);
         sprite.setPosition(newPos.x, newPos.y);
-        if (newPos.y < -50) { // можна підлаштувати під розмір вікна
-            active = false; // ворог зник
+        if (newPos.y < -50) {
+            active = false;
         }
 
     }
@@ -41,7 +41,7 @@ public class Enemy {
     }
 
     public void destroy() {
-        active = false; // ворог зник
+        active = false;
     }
 
     public boolean isActive() {

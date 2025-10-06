@@ -10,7 +10,7 @@ public class Background {
     private Texture texture;
     private FitViewport viewport;
     private float scrollY = 0f;
-    private float speed = 50f; // скорость движения фона
+    private float speed = 50f;
 
     public Background(FitViewport viewport) {
         this.viewport = viewport;
