@@ -12,10 +12,8 @@ import com.kursch.patterns.SpiralPattern;
 public class EnemyManager {
     private Array<Enemy> enemies;
     private Texture enemiesTexture;
-    private FitViewport viewport;
 
     public EnemyManager(FitViewport viewport) {
-        this.viewport = viewport;
         enemiesTexture = new Texture("26482.png");
         enemies = new Array<>();
         spawnWave();
@@ -23,7 +21,7 @@ public class EnemyManager {
 
     private void spawnWave() {
         TextureRegion region = new TextureRegion(enemiesTexture, 110, 75, 15, 12);
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 100; i++) {
             float x = 100 + i * 100;
             MovementPattern pattern = new SpiralPattern(new Vector2(x, 500), 10f, 2f);
             enemies.add(new Enemy(region, pattern, x, 500));

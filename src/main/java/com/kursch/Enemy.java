@@ -8,11 +8,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.kursch.patterns.MovementPattern;
 
 public class Enemy {
+
     private Sprite sprite;
     private float time;
     private MovementPattern pattern;
     private boolean active = true;
-    private Player player;
 
     public Enemy(TextureRegion region, MovementPattern pattern, float x, float y) {
         this.pattern = pattern;
@@ -25,10 +25,6 @@ public class Enemy {
         time += delta;
         Vector2 newPos = pattern.getPosition(time);
         sprite.setPosition(newPos.x, newPos.y);
-        if (newPos.y < -50) {
-            active = false;
-        }
-
     }
 
     public void draw(SpriteBatch batch) {
@@ -36,6 +32,7 @@ public class Enemy {
             sprite.draw(batch);
     }
 
+    // хітбокс ворога
     public Rectangle getBounds() {
         return sprite.getBoundingRectangle();
     }
