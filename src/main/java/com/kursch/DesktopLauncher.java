@@ -10,8 +10,8 @@ public class DesktopLauncher {
 
         config.addIcon("SpriteSheet2_Enemies.png", Files.FileType.Internal);
         config.title = "My Game";
-        config.width = 1300;
-        config.height = 800;
+        config.width = 800;
+        config.height = 600;
 
         new LwjglApplication(new Main(), config);
     }

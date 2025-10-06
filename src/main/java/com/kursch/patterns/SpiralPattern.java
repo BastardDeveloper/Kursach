@@ -17,6 +17,6 @@ public class SpiralPattern implements MovementPattern {
     public Vector2 getPosition(float t) {
         float r = radiusSpeed * t;
         float angle = angleSpeed * t;
-        return new Vector2(center.x + r * MathUtils.cos(angle), center.y + r * MathUtils.sin(angle));
+        return new Vector2(center.x, center.y);
     }
 }

@@ -9,13 +9,12 @@ public class Bullet {
 
     private Sprite bulletSprite;
     private Vector2 position;
-    private float speed = 400f;
+    private float speed = 40f;
     private boolean active = true;
 
     public Bullet(Sprite bulletSprite, float startX, float startY) {
         this.bulletSprite = bulletSprite;
         this.position = new Vector2(startX, startY);
-        bulletSprite.setSize(10, 20);
     }
 
     public void update(float delta) {

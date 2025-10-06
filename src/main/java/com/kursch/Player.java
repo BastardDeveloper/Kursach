@@ -23,10 +23,10 @@ public class Player {
         this.viewport = viewport;
 
         playerTexture = new TextureRegion(new Texture("SpriteSheet1_Enemies.png"), 100, 78, 250, 250);
-        bulletTexture = new TextureRegion(new Texture("26482.png"), 307, 136, 15, 15);
+        bulletTexture = new TextureRegion(new Texture("ВеселаяНарезка.png"), 312, 139, 4, 9);
 
         playerSprite = new Sprite(playerTexture);
-        playerSprite.setSize(35, 35);
+        playerSprite.setSize(40, 40);
         playerSprite.setPosition(viewport.getWorldWidth() / 2f - 17.5f, 20);
 
         bullets = new Array<>();
@@ -39,6 +39,10 @@ public class Player {
             playerSprite.translateX(-speed);
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
             playerSprite.translateX(speed);
+        if (Gdx.input.isKeyPressed(Input.Keys.UP))
+            playerSprite.translateY(speed);
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
+            playerSprite.translateY(-speed);
         playerSprite.setX(MathUtils.clamp(playerSprite.getX(), 0,
                 viewport.getWorldWidth() - playerSprite.getWidth()));
 
@@ -52,10 +56,11 @@ public class Player {
     }
 
     private void shoot() {
-        Bullet newBullet = new Bullet(new Sprite(bulletTexture),
-                playerSprite.getX() + playerSprite.getWidth() / 2f - 2,
-                playerSprite.getY() + playerSprite.getHeight());
-        bullets.add(newBullet);
+        Sprite bulletSprite = new Sprite(bulletTexture);
+        bulletSprite.setSize(40, 90);
+        float startX = playerSprite.getX() + (playerSprite.getWidth() - bulletSprite.getWidth()) / 2;
+        float startY = playerSprite.getY() + playerSprite.getHeight();
+        bullets.add(new Bullet(bulletSprite, startX, startY));
     }
 
     public void draw(SpriteBatch batch) {
