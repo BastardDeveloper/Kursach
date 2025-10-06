@@ -57,8 +57,8 @@ public class Player {
 
     private void shoot() {
         Sprite bulletSprite = new Sprite(bulletTexture);
-        bulletSprite.setSize(40, 90);
-        float startX = playerSprite.getX() + (playerSprite.getWidth() - bulletSprite.getWidth()) / 2;
+        bulletSprite.setSize(20, 50);
+        float startX = (playerSprite.getX() + (playerSprite.getWidth() - bulletSprite.getWidth()) / 2) - 7;
         float startY = playerSprite.getY() + playerSprite.getHeight();
         bullets.add(new Bullet(bulletSprite, startX, startY));
     }
