@@ -1,18 +1,17 @@
 package com.kursch;
 
 import com.badlogic.gdx.Files;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 
 public class DesktopLauncher {
     public static void main(String[] args) {
-        LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+        Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 
-        config.addIcon("SpriteSheet2_Enemies.png", Files.FileType.Internal);
-        config.title = "My Game";
-        config.width = 1300;
-        config.height = 800;
+        config.setTitle("My Game");
+        config.setWindowedMode(1300, 800);
+        config.setWindowIcon(Files.FileType.Internal, "SpriteSheet2_Enemies.png");
 
-        new LwjglApplication(new Main(), config);
+        new Lwjgl3Application(new Main(), config);
     }
 }

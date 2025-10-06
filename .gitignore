@@ -31,3 +31,6 @@ pom.xml
 
 # vscode
 .vscode/
+
+# idea
+.idea/
