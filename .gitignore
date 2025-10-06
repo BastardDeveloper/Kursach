@@ -25,3 +25,6 @@ replay_pid*
 
 # Сборочная папка Gradle / Maven
 target/
+
+#maven
+pom.xml 
