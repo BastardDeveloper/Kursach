@@ -31,3 +31,4 @@ pom.xml
 
 # vscode
 .vscode/
+.fake
