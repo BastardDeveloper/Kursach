@@ -43,7 +43,7 @@ public class Enemy {
         Vector2 newPos = pattern.getPosition(time);
         position.set(newPos);
 
-        // вычисляем направление движения (dx)
+        // вычисляем направление движения (dx) и (dy)
         float dx = position.x - prevPosition.x;
         float dy = position.y - prevPosition.y;
         currentFrame = getFrameForDirection(dx, dy);
@@ -63,7 +63,7 @@ public class Enemy {
         animationTimer += Gdx.graphics.getDeltaTime(); // прибавляем время с последнего кадра
 
         if (animationTimer >= animationSpeed) {
-            animIndex = (animIndex + 1) % 2; // переключаем между 0 и 1
+            animIndex = (animIndex + 1) % 2;
             animationTimer = 0f;
         }
         // Если почти не двигается - стоим на месте (нейтрально)

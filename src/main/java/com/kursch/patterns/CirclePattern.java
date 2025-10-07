@@ -17,7 +17,7 @@ public class CirclePattern implements MovementPattern {
 
     @Override
     public Vector2 getPosition(float t) {
-        float angle = angularSpeed * t * 3;
+        float angle = angularSpeed * t;
 
         float x = center.x + MathUtils.cos(angle) * radius * 8;
         float y = center.y + MathUtils.sin(angle) * radius * 8;
