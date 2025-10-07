@@ -80,6 +80,9 @@ public class Main implements ApplicationListener {
 
     @Override
     public void dispose() {
+        spriteBatch.dispose();
         background.dispose();
+        player.dispose();
+        EnemyManager.dispose();
     }
 }

@@ -7,28 +7,33 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kursch.patterns.MovementPattern;
 import com.kursch.patterns.ZigzagPattern;
 import com.kursch.patterns.CirclePattern;
+import com.kursch.patterns.InfinityPattern;
 import com.kursch.patterns.Stap_wawe;
 
 public class EnemyManager {
 
     private Array<Enemy> enemies;
 
-    // хуй
     public EnemyManager(FitViewport viewport) {
         enemies = new Array<>();
         spawnWave();
     }
 
     private void spawnWave() {
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 8; i++) {
             float x = 100 + i * 200;
-            MovementPattern circlePattern = new CirclePattern(new Vector2(x, 500), 10f, 10f);
-            MovementPattern ZigzagPattern = new ZigzagPattern(new Vector2(x, 500), 10f, 500f, 5f);
-            MovementPattern Stap_wawe = new Stap_wawe(new Vector2(x, 500), 200f, 50f, 5f);
+            MovementPattern circlePattern = new CirclePattern(new Vector2(x, 500), 20f, 1);
+            // 2f);
+            // MovementPattern ZigzagPattern = new ZigzagPattern(new Vector2(x, 500), 1f,
+            // 500f, 1f);
+            // MovementPattern InfinityPattern = new InfinityPattern(new Vector2(x, 500),
+            // 50f, 0.3f);
+            // MovementPattern Stap_wawe = new Stap_wawe(new Vector2(x, 500), 200f, 50f,
+            // 5f);
             // создаём врага типа blueRed_Bazz_Enemy
-            enemies.add(new blueRed_Bazz_Enemy(ZigzagPattern, x, 500));
             enemies.add(new blueRed_Bazz_Enemy(circlePattern, x, 500));
-            enemies.add(new blueRed_Bazz_Enemy(Stap_wawe, x, 500));
+            // enemies.add(new blueRed_Bazz_Enemy(InfinityPattern, x, 500));
+            // enemies.add(new blueRed_Bazz_Enemy(Stap_wawe, x, 500));
 
         }
     }
@@ -77,5 +82,13 @@ public class EnemyManager {
 
     public Array<Enemy> getEnemies() {
         return enemies;
+    }
+
+    public void dispose() {
+        for (Enemy e : enemies) {
+            e.dispose();
+
+        }
+        blueRed_Bazz_Enemy.disposeStatic();
     }
 }
