@@ -66,44 +66,43 @@ public class Enemy {
             animIndex = (animIndex + 1) % 2; // переключаем между 0 и 1
             animationTimer = 0f;
         }
-        // Если почти не двигается — стоим на месте (нейтрально)
+        // Если почти не двигается - стоим на месте (нейтрально)
         if (Math.abs(dx) < 0.2f && Math.abs(dy) < 0.2f) {
-            return directionFrames[0]; // enemy_up — нейтральное положение
+            return directionFrames[0];
         }
 
-        // Анимация — переключение между кадрами (0 и 1)
         int animIndex = (int) ((time * 8) % 2);
 
         // === Движение вверх ===
         if (dy > 1f) {
-            return directionFrames[0 + animIndex]; // 0–1
+            return directionFrames[0 + animIndex];
         }
 
         // === Движение вниз ===
         if (dy < -1f) {
-            return directionFrames[2 + animIndex]; // 2–3
+            return directionFrames[2 + animIndex];
         }
 
         // === Движение влево ===
         if (dx < -2) {
-            return directionFrames[8 + animIndex]; // FullLeft 8–9
+            return directionFrames[8 + animIndex];
         } else if (dx < -1.5f) {
-            return directionFrames[6 + animIndex]; // Left2 6–7
+            return directionFrames[6 + animIndex];
         } else if (dx < -1f) {
-            return directionFrames[4 + animIndex]; // Left1 4–5
+            return directionFrames[4 + animIndex];
         }
 
         // === Движение вправо ===
         if (dx > 2) {
-            return directionFrames[14 + animIndex]; // FullRight 14–15
+            return directionFrames[14 + animIndex];
         } else if (dx > 1.5f) {
-            return directionFrames[12 + animIndex]; // Right2 12–13
+            return directionFrames[12 + animIndex];
         } else if (dx > 1f) {
-            return directionFrames[10 + animIndex]; // Right1 10–11
+            return directionFrames[10 + animIndex];
         }
 
         // === Если слабое движение — вверх по умолчанию ===
-        return directionFrames[0 + animIndex]; // enemy_up / enemy_up_2
+        return directionFrames[0 + animIndex];
     }
 
     public Rectangle getBounds() {
