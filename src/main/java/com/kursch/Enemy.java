@@ -60,49 +60,52 @@ public class Enemy {
     }
 
     private TextureRegion getFrameForDirection(float dx, float dy) {
-        animationTimer += Gdx.graphics.getDeltaTime(); // прибавляем время с последнего кадра
-
+        // Обновляем таймер анимации крыльев
+        animationTimer += Gdx.graphics.getDeltaTime();
         if (animationTimer >= animationSpeed) {
-            animIndex = (animIndex + 1) % 2;
+            animIndex = (animIndex + 1) % 2; // переключаем 0 -> 1 -> 0...
             animationTimer = 0f;
         }
+
         // Если почти не двигается - стоим на месте (нейтрально)
         if (Math.abs(dx) < 0.2f && Math.abs(dy) < 0.2f) {
-            return directionFrames[0];
+            return directionFrames[0 + animIndex]; // вверх с анимацией крыльев
         }
 
-        int animIndex = (int) ((time * 8) % 2);
+        // === Определяем НАПРАВЛЕНИЕ (baseIndex) ===
+        int baseIndex;
 
-        // === Движение вверх ===
+        // Движение вверх
         if (dy > 1f) {
-            return directionFrames[0 + animIndex];
+            baseIndex = 0; // вверх
         }
-
-        // === Движение вниз ===
-        if (dy < -1f) {
-            return directionFrames[2 + animIndex];
+        // Движение вниз
+        else if (dy < -1f) {
+            baseIndex = 2; // вниз
         }
-
-        // === Движение влево ===
-        if (dx < -2) {
-            return directionFrames[8 + animIndex];
+        // Движение влево (3 степени наклона)
+        else if (dx < -2f) {
+            baseIndex = 8; // полностью влево
         } else if (dx < -1.5f) {
-            return directionFrames[6 + animIndex];
+            baseIndex = 6; // влево средне
         } else if (dx < -1f) {
-            return directionFrames[4 + animIndex];
+            baseIndex = 4; // влево слабо
         }
-
-        // === Движение вправо ===
-        if (dx > 2) {
-            return directionFrames[14 + animIndex];
+        // Движение вправо (3 степени наклона)
+        else if (dx > 2f) {
+            baseIndex = 14; // полностью вправо
         } else if (dx > 1.5f) {
-            return directionFrames[12 + animIndex];
+            baseIndex = 12; // вправо средне
         } else if (dx > 1f) {
-            return directionFrames[10 + animIndex];
+            baseIndex = 10; // вправо слабо
+        }
+        // По умолчанию
+        else {
+            baseIndex = 0; // вверх
         }
 
-        // === Если слабое движение — вверх по умолчанию ===
-        return directionFrames[0 + animIndex];
+        // Возвращаем кадр: направление + анимация крыльев
+        return directionFrames[baseIndex + animIndex];
     }
 
     public Rectangle getBounds() {
