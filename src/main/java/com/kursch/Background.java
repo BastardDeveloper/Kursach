@@ -1,5 +1,6 @@
 package com.kursch;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -14,7 +15,7 @@ public class Background {
 
     public Background(FitViewport viewport) {
         this.viewport = viewport;
-        texture = new Texture("bg1.png");
+        texture = new Texture("Bg1.png");
     }
 
     public void update(float delta) {
