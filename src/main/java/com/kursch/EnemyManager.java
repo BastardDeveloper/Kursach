@@ -1,41 +1,38 @@
 package com.kursch;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kursch.patterns.MovementPattern;
-import com.kursch.patterns.SpiralPattern;
+import com.kursch.patterns.CirclePattern;
 
 public class EnemyManager {
+
     private Array<Enemy> enemies;
-    private Texture enemiesTexture;
 
     public EnemyManager(FitViewport viewport) {
-        enemiesTexture = new Texture("26482.png");
         enemies = new Array<>();
         spawnWave();
     }
 
     private void spawnWave() {
-        TextureRegion region = new TextureRegion(enemiesTexture, 110, 75, 15, 12);
         for (int i = 0; i < 7; i++) {
             float x = 100 + i * 100;
-            MovementPattern pattern = new SpiralPattern(new Vector2(x, 500), 10f, 2f);
-            enemies.add(new Enemy(region, pattern, x, 500));
+            MovementPattern pattern = new CirclePattern(new Vector2(x, 500), 10f, 2f);
+            // создаём врага типа blueRed_Bazz_Enemy
+            enemies.add(new blueRed_Bazz_Enemy(pattern, x, 500));
         }
     }
 
     public void update(float delta, Player player) {
-
+        // обновление врагов
         for (Enemy e : enemies) {
             if (e.isActive())
                 e.update(delta);
         }
 
-        // колізія ворогів з кулями гравця
+        // коллизия врагов с пулями игрока
         for (Bullet b : player.getPlayerBullets()) {
             for (Enemy e : enemies) {
                 if (e.isActive() && b.getBounds().overlaps(e.getBounds())) {
@@ -45,12 +42,14 @@ public class EnemyManager {
             }
         }
 
+        // удаление неактивных врагов
         for (int i = enemies.size - 1; i >= 0; i--) {
             if (!enemies.get(i).isActive()) {
                 enemies.removeIndex(i);
             }
         }
 
+        // удаление неактивных пуль игрока
         for (int i = player.getPlayerBullets().size - 1; i >= 0; i--) {
             if (!player.getPlayerBullets().get(i).isActive()) {
                 player.getPlayerBullets().removeIndex(i);
@@ -59,6 +58,7 @@ public class EnemyManager {
     }
 
     public void draw(SpriteBatch batch) {
+        // если все враги уничтожены, спавним новую волну
         if (enemies.size == 0) {
             spawnWave();
         }
