@@ -10,7 +10,7 @@ public class Background {
     private Texture texture;
     private FitViewport viewport;
     private float scrollY = 0f;
-    private float speed = 50f;
+    private float speed = 100f;
 
     public Background(FitViewport viewport) {
         this.viewport = viewport;
@@ -19,7 +19,7 @@ public class Background {
 
     public void update(float delta) {
         scrollY += speed * delta;
-        if (scrollY > 600)
+        if (scrollY > 900)
             scrollY = 0;
     }
 
