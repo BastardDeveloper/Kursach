@@ -8,6 +8,7 @@ import com.kursch.patterns.MovementPattern;
 import com.kursch.patterns.ZigzagPattern;
 import com.kursch.patterns.CirclePattern;
 import com.kursch.patterns.InfinityPattern;
+import com.kursch.patterns.LeftRightPattern;
 import com.kursch.patterns.Stap_wawe;
 
 public class EnemyManager {
@@ -22,16 +23,17 @@ public class EnemyManager {
     private void spawnWave() {
         for (int i = 0; i < 8; i++) {
             float x = 100 + i * 200;
-            MovementPattern circlePattern = new CirclePattern(new Vector2(x, 500), 20f, 1);
+            // MovementPattern circlePattern = new CirclePattern(new Vector2(x, 500), 20f,
             // 2f);
             // MovementPattern ZigzagPattern = new ZigzagPattern(new Vector2(x, 500), 1f,
             // 500f, 1f);
             // MovementPattern InfinityPattern = new InfinityPattern(new Vector2(x, 500),
             // 50f, 0.3f);
-            // MovementPattern Stap_wawe = new Stap_wawe(new Vector2(x, 500), 200f, 50f,
+            // MovementPattern Stap_wawe = new Stap_wawe(new Vector2(x, 500), 200f, 100f,
             // 5f);
-            // создаём врага типа blueRed_Bazz_Enemy
-            enemies.add(new blueRed_Bazz_Enemy(circlePattern, x, 500));
+            MovementPattern LeftRightPattern = new LeftRightPattern(new Vector2(x, 500), 200f, 2f);
+            enemies.add(new blueRed_Bazz_Enemy(LeftRightPattern, x, 500));
+            // enemies.add(new blueRed_Bazz_Enemy(circlePattern, x, 500));
             // enemies.add(new blueRed_Bazz_Enemy(InfinityPattern, x, 500));
             // enemies.add(new blueRed_Bazz_Enemy(Stap_wawe, x, 500));
 
