@@ -13,6 +13,7 @@ public class EnemyManager {
 
     private Array<Enemy> enemies;
 
+    // хуй
     public EnemyManager(FitViewport viewport) {
         enemies = new Array<>();
         spawnWave();
