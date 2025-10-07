@@ -34,7 +34,7 @@ public class Main implements ApplicationListener {
     @Override
     public void create() {
         spriteBatch = new SpriteBatch();
-        viewport = new FitViewport(800, 600);
+        viewport = new FitViewport(1600, 900);
 
         player = new Player(viewport);
         background = new Background(viewport);
