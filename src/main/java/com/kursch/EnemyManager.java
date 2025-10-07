@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kursch.patterns.MovementPattern;
 import com.kursch.patterns.ZigzagPattern;
 import com.kursch.patterns.CirclePattern;
-import com.kursch.patterns.ZigzagPattern;
+import com.kursch.patterns.Stap_wawe;
 
 public class EnemyManager {
 
@@ -19,12 +19,16 @@ public class EnemyManager {
     }
 
     private void spawnWave() {
-        for (int i = 0; i < 10; i++) {
-            float x = 100 + i * 100;
-            MovementPattern circlePattern = new CirclePattern(new Vector2(x, 500), 10f, 2f);
+        for (int i = 0; i < 7; i++) {
+            float x = 100 + i * 200;
+            MovementPattern circlePattern = new CirclePattern(new Vector2(x, 500), 10f, 10f);
             MovementPattern ZigzagPattern = new ZigzagPattern(new Vector2(x, 500), 10f, 500f, 5f);
+            MovementPattern Stap_wawe = new Stap_wawe(new Vector2(x, 500), 200f, 50f, 5f);
             // создаём врага типа blueRed_Bazz_Enemy
             enemies.add(new blueRed_Bazz_Enemy(ZigzagPattern, x, 500));
+            enemies.add(new blueRed_Bazz_Enemy(circlePattern, x, 500));
+            enemies.add(new blueRed_Bazz_Enemy(Stap_wawe, x, 500));
+
         }
     }
 

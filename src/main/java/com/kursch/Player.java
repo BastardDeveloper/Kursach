@@ -33,7 +33,7 @@ public class Player {
     }
 
     public void update(float delta) {
-        float speed = 450 * delta;
+        float speed = 850 * delta;
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
             playerSprite.translateX(-speed);
