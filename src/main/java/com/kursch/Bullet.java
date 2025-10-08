@@ -9,7 +9,7 @@ public class Bullet {
 
     private Sprite bulletSprite;
     private Vector2 position;
-    private float speed = 2000f;
+    private float speed = 5000f;
     private boolean active = true;
 
     public Bullet(Sprite bulletSprite, float startX, float startY) {

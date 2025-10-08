@@ -10,7 +10,7 @@ public class DesktopLauncher {
 
         config.setTitle("My Game");
         config.setWindowedMode(800, 600);
-        config.setWindowIcon(Files.FileType.Internal, "SpriteSheet2_Enemies.png");
+        config.setWindowIcon(Files.FileType.Internal, "icon.png");
 
         new Lwjgl3Application(new Main(), config);
     }

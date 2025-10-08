@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -73,6 +74,15 @@ public class Player {
         for (Bullet b : bullets) {
             b.draw(batch);
         }
+    }
+
+    public void destroy() {
+        System.out.println("игрок умер ыыыыыыыыыыыыыыыыыыы");
+    }
+
+    public Rectangle getBounds() {
+        return new Rectangle(playerSprite.getX(), playerSprite.getY(), playerSprite.getWidth(),
+                playerSprite.getHeight());
     }
 
     public Array<Bullet> getPlayerBullets() {

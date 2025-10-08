@@ -39,6 +39,7 @@ public class EnemyManager {
             // enemies.add(new blueRed_Bazz_Enemy(Stap_wawe, x, 500));
 
         }
+
     }
 
     public void update(float delta, Player player) {
@@ -55,6 +56,13 @@ public class EnemyManager {
                     e.destroy();
                     b.destroy();
                 }
+            }
+        }
+        // коллизия врагов с пулями игрока
+
+        for (Enemy e : enemies) {
+            if (e.isActive() && player.getBounds().overlaps(e.getBounds())) {
+                player.destroy();
             }
         }
 
