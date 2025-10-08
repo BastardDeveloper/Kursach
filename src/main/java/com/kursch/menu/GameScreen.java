@@ -47,7 +47,7 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         // Обновление (только если игра не завершена)
         if (!gameOver) {
-            game.background.update(delta);
+            game.background.update(delta, 400);
             game.player.update(delta);
             game.enemyManager.update(delta, game.player);
 
