@@ -1,8 +1,5 @@
 package com.kursch;
 
-import com.badlogic.gdx.Gdx;
-
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -56,6 +53,9 @@ public class Main extends Game {
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
+        if (getScreen() != null) {
+            getScreen().resize(width, height);
+        }
     }
 
     @Override

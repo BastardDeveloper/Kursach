@@ -3,44 +3,37 @@ package com.kursch.menu;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kursch.Main;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public class MainMenuScreen implements Screen {
-
-    private final Main game;
     private final Stage stage;
     private final Skin skin;
     private final SpriteBatch batch;
-    private final OrthographicCamera camera;
 
     public MainMenuScreen(final Main game) {
-        this.game = game;
         batch = new SpriteBatch();
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 800, 480);
 
-        stage = new Stage();
+        // Используем FitViewport с фиксированным размером
+        stage = new Stage(new FitViewport(1600, 900));
         Gdx.input.setInputProcessor(stage);
 
-        skin = new Skin(Gdx.files.internal("uiskin.json")); // стандартная skin из gdx
+        skin = new Skin(Gdx.files.internal("uiskin.json"));
 
         Table table = new Table();
         table.setFillParent(true);
         stage.addActor(table);
 
         TextButton playButton = new TextButton("Game", skin);
-        TextButton exitButton = new TextButton("Exiet", skin);
+        TextButton exitButton = new TextButton("Exit", skin);
 
-        // Обработчик кнопки "Играть"
         playButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -49,7 +42,6 @@ public class MainMenuScreen implements Screen {
             }
         });
 
-        // Обработчик кнопки "Выход"
         exitButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -57,8 +49,11 @@ public class MainMenuScreen implements Screen {
             }
         });
 
-        table.add(playButton).pad(10).row();
-        table.add(exitButton).pad(10);
+        table.add(playButton).width(300).height(80).pad(20).row();
+        table.add(exitButton).width(300).height(80).pad(20);
+
+        // ВАЖНО: Вызываем resize сразу при создании
+        resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
     @Override
@@ -72,6 +67,7 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
+        stage.getViewport().update(width, height, true);
     }
 
     @Override
@@ -88,11 +84,13 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void show() {
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
     public void dispose() {
         stage.dispose();
         batch.dispose();
+        skin.dispose();
     }
 }
