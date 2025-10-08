@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kursch.Main;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
@@ -22,7 +21,7 @@ public class MainMenuScreen implements Screen {
         batch = new SpriteBatch();
 
         // Используем FitViewport с фиксированным размером
-        stage = new Stage(new FitViewport(1600, 900));
+        stage = new Stage(game.viewport);
         Gdx.input.setInputProcessor(stage);
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
