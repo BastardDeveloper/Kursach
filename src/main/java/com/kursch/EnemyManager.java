@@ -5,11 +5,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kursch.patterns.MovementPattern;
-import com.kursch.patterns.ZigzagPattern;
+// import com.kursch.patterns.ZigzagPattern;
 import com.kursch.patterns.CirclePattern;
-import com.kursch.patterns.InfinityPattern;
-import com.kursch.patterns.LeftRightPattern;
-import com.kursch.patterns.Stap_wawe;
+// import com.kursch.patterns.InfinityPattern;
+// import com.kursch.patterns.LeftRightPattern;
+// import com.kursch.patterns.Stap_wawe;
 
 public class EnemyManager {
 
