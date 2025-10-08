@@ -8,11 +8,14 @@ import com.badlogic.gdx.math.Vector2;
 import com.kursch.patterns.MovementPattern;
 
 public class Enemy {
+
     private TextureRegion[] directionFrames;
     private TextureRegion currentFrame;
     private MovementPattern pattern;
     private boolean active = true;
+    private boolean inFormation = false;
     private float time;
+    private int assignedSlot = -1;
     private Vector2 position = new Vector2();
     private Vector2 prevPosition = new Vector2();
     private float width = 30, height = 30;
@@ -40,6 +43,11 @@ public class Enemy {
         prevPosition.set(position);
         Vector2 newPos = pattern.getPosition(time);
         position.set(newPos);
+
+        // mark as in-formation if the current pattern declares completion
+        if (!inFormation && pattern.isComplete(time)) {
+            inFormation = true;
+        }
 
         // Вычисляем мгновенное направление
         float dx = position.x - prevPosition.x;
@@ -167,6 +175,51 @@ public class Enemy {
 
     public boolean isActive() {
         return active;
+    }
+
+    public void shooting() {
+
+    }
+
+    public Vector2 getPosition() {
+        return new Vector2(position.x, position.y);
+    }
+
+    public void setMovementPattern(MovementPattern newPattern) {
+        this.pattern = newPattern;
+        this.time = 0f; // сбрасываем таймер, чтобы новый паттерн начал движение с нуля
+        // If we set a LeftRightPattern, that's the in-formation idle animation - keep
+        // the inFormation flag. Otherwise, switching pattern likely means leaving
+        // formation.
+        if (newPattern instanceof com.kursch.patterns.LeftRightPattern) {
+            this.inFormation = true;
+        } else {
+            this.inFormation = false;
+        }
+    }
+
+    public void setAssignedSlot(int slot) {
+        this.assignedSlot = slot;
+    }
+
+    public int getAssignedSlot() {
+        return assignedSlot;
+    }
+
+    /**
+     * Return whether the current movement pattern considers itself complete at the
+     * current time.
+     */
+    public boolean isPatternComplete() {
+        return pattern != null && pattern.isComplete(time);
+    }
+
+    public MovementPattern getPattern() {
+        return pattern;
+    }
+
+    public boolean isInFormation() {
+        return inFormation;
     }
 
     public void dispose() {

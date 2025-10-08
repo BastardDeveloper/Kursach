@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kursch.menu.GameScreen;
@@ -88,6 +89,10 @@ public class Player {
 
     public Array<Bullet> getPlayerBullets() {
         return bullets;
+    }
+
+    public Vector2 getPosition() {
+        return new Vector2(playerSprite.getX(), playerSprite.getY());
     }
 
     public void dispose() {
