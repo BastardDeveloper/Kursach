@@ -1,36 +1,32 @@
 package com.kursch;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kursch.menu.MainMenuScreen;
+import com.kursch.menu.GameScreen;
 
 public class Main extends Game {
-    public SpriteBatch spriteBatch; // добавил public
-    public FitViewport viewport; // добавил public
-    Texture enemiesTexture;
-    Texture bulletTexture;
-    public Player player; // добавил public
-    public Background background; // добавил public
-    public EnemyManager EnemyManager;
-    Sprite playerSprite;
-    Sprite enemySprite;
-    TextureRegion playerTexture;
+    public SpriteBatch spriteBatch;
+    public FitViewport viewport;
+
+    public Player player;
+    public Background background;
+    public EnemyManager enemyManager;
+    public GameScreen gameScreen;
     Array<Sprite> enemySprites;
 
     @Override
     public void create() {
         spriteBatch = new SpriteBatch();
         viewport = new FitViewport(1600, 900);
-
         setScreen(new MainMenuScreen(this));
-        player = new Player(viewport);
         background = new Background(viewport);
-        EnemyManager = new EnemyManager(viewport);
+        gameScreen = new GameScreen(this);
+        player = new Player(viewport, gameScreen);
+        enemyManager = new EnemyManager(viewport);
 
     }
 
@@ -63,6 +59,6 @@ public class Main extends Game {
         spriteBatch.dispose();
         background.dispose();
         player.dispose();
-        EnemyManager.dispose();
+        enemyManager.dispose();
     }
 }

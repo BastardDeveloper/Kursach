@@ -101,5 +101,6 @@ public class EnemyManager {
 
         }
         blueRed_Bazz_Enemy.disposeStatic();
+
     }
 }

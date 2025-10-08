@@ -10,19 +10,20 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.kursch.menu.GameScreen;
 
 public class Player {
 
     private Array<Bullet> bullets;
     private TextureRegion playerTexture;
     private TextureRegion bulletTexture;
-
+    private GameScreen gameScreen;
     private Sprite playerSprite;
     private FitViewport viewport;
 
-    public Player(FitViewport viewport) {
+    public Player(FitViewport viewport, GameScreen gameScreen) {
         this.viewport = viewport;
-
+        this.gameScreen = gameScreen;
         playerTexture = new TextureRegion(new Texture("SpriteSheet1_Enemies.png"), 100, 78, 250, 250);
         bulletTexture = new TextureRegion(new Texture("ВеселаяНарезка.png"), 312, 139, 4, 9);
 
@@ -77,7 +78,7 @@ public class Player {
     }
 
     public void destroy() {
-        System.out.println("игрок умер ыыыыыыыыыыыыыыыыыыы");
+        gameScreen.triggerGameOver();
     }
 
     public Rectangle getBounds() {
