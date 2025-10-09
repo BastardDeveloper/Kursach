@@ -15,7 +15,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.kursch.patterns.CurvedEntryPattern;
 import com.kursch.patterns.LeftRightPattern;
 // import com.kursch.patterns.InfinityPattern;
-// import com.kursch.patterns.LeftRightPattern;
+import com.kursch.patterns.LeftRightPattern;
 // import com.kursch.patterns.Stap_wawe;
 import com.kursch.patterns.DiveAttackPattern;
 
@@ -26,25 +26,23 @@ public class EnemyManager {
     private float attackTimer = 0f;
     private float attackInterval = 7f; // каждые 7 секунд атака из строя
 
-    private final float formationY = 400f; // централь высота для среднего ряда
-    private final int formationCols = 8;
-    private final int formationRows = 4; // 4 линии в строю
-    private final float formationSpacing = 120f; // horizontal spacing
-    private final float formationRowSpacing = 60f; // vertical spacing between rows
-
+    private final float formationY = 700f; // централь высота для среднего ряда
+    private final int formationCols = 8; // Столбы врагов
+    private final int formationRows = 2; // ряды врагов
+    private final float formationSpacing = 120f;
+    private final float formationRowSpacing = 60f;
     private final Random random = new Random();
     private final FitViewport viewport;
 
-    // tuning parameters
-    private float entryDuration = 6f; // seconds to reach formation (larger -> slower entry)
-    private float diveDuration = 6f; // larger -> slower dive attack
+    private float entryDuration = 6f;
+    private float diveDuration = 6f;
     private float minSpawnInterval = 5f;
     private float maxSpawnInterval = 8f;
 
     private boolean[] slotReserved;
-    private Map<Enemy, Integer> reservedMap;
+    private Map<Enemy, Integer> reservedMap; // занят ли слот в строю
 
-    private Map<Enemy, Float> pendingReturnTimers;
+    private Map<Enemy, Float> pendingReturnTimers; // таймер через который враг должен вернутся в строй после атаки
 
     int count = MathUtils.random(0, 10);
     float random_Float = random.nextFloat();
@@ -65,7 +63,7 @@ public class EnemyManager {
         if (spawnTimer >= spawnInterval) {
             spawnRandomWave();
             spawnTimer = 0f;
-            // randomize next spawn interval a bit
+
             spawnInterval = minSpawnInterval + random.nextFloat() * (maxSpawnInterval - minSpawnInterval);
         }
 
@@ -73,13 +71,17 @@ public class EnemyManager {
             launchAttackFromFormation(player);
             attackTimer = 0f;
         }
-        // обновление врагов
+
+        // для каждого врага
         for (Enemy e : enemies) {
             if (e.isActive())
-                e.update(delta);
+                e.update(delta); // обновление
+            Vector2 start = new Vector2(e.getPosition());
 
+            // проверка закончил ли враг патерн атаки
             if (e.isActive() && e.getAssignedSlot() != -1 && e.isPatternComplete()) {
                 MovementPattern cur = e.getPattern();
+
                 if (cur instanceof DiveAttackPattern) {
                     if (!pendingReturnTimers.containsKey(e)) {
                         pendingReturnTimers.put(e, 0.6f);
@@ -94,6 +96,7 @@ public class EnemyManager {
                         float slotX = (viewport.getWorldWidth() / 2f - (formationCols - 1) * formationSpacing / 2f)
                                 + col * formationSpacing;
                         float slotY = formationY + (row - (formationRows - 1) / 2f) * formationRowSpacing;
+                        e.setBaseFrame();
                         MovementPattern lr = new LeftRightPattern(new Vector2(slotX, slotY), 8f,
                                 1.2f + random.nextFloat() * 0.8f);
                         e.setMovementPattern(lr);
@@ -130,7 +133,6 @@ public class EnemyManager {
             }
         }
 
-        // destroy enemies that flew far off-screen (allow some margin)
         float margin = 200f;
         float worldW = viewport.getWorldWidth();
         float worldH = viewport.getWorldHeight();
@@ -139,7 +141,7 @@ public class EnemyManager {
                 continue;
             Vector2 p = e.getPosition();
             if (p.x < -margin || p.x > worldW + margin || p.y < -margin || p.y > worldH + margin) {
-                // free reservation if any
+
                 if (reservedMap.containsKey(e)) {
                     int s = reservedMap.remove(e);
                     if (s >= 0 && s < slotReserved.length)
@@ -149,21 +151,18 @@ public class EnemyManager {
             }
         }
 
-        // cleanup reserved map for dead enemies; keep reservations while enemy is
-        // away on attack so its cell remains claimed
         java.util.Iterator<Map.Entry<Enemy, Integer>> it = reservedMap.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<Enemy, Integer> entry = it.next();
             Enemy e = entry.getKey();
             int s = entry.getValue();
-            if (!e.isActive()) { // cleanup dead
+            if (!e.isActive()) {
                 if (s >= 0 && s < slotReserved.length)
                     slotReserved[s] = false;
                 it.remove();
             }
         }
 
-        // коллизия врагов с пулями игрока
         for (Bullet b : player.getPlayerBullets()) {
             for (Enemy e : enemies) {
                 if (e.isActive() && b.getBounds().overlaps(e.getBounds())) {
@@ -172,7 +171,6 @@ public class EnemyManager {
                 }
             }
         }
-        // коллизия врагов с пулями игрока
 
         for (Enemy e : enemies) {
             if (e.isActive() && player.getBounds().overlaps(e.getBounds())) {
@@ -200,8 +198,8 @@ public class EnemyManager {
         }
     }
 
+    // метод спавна врагов
     private void spawnRandomWave() {
-        // Determine occupied formation slots
         boolean[] occupied = new boolean[formationCols];
         for (Enemy e : enemies) {
             if (!e.isActive())
@@ -216,13 +214,12 @@ public class EnemyManager {
             }
         }
 
-        // collect free cells (row-major)
         java.util.List<Integer> freeSlots = new java.util.ArrayList<>();
         for (int r = 0; r < formationRows; r++) {
             for (int c = 0; c < formationCols; c++) {
                 int cellId = r * formationCols + c;
                 boolean occ = false;
-                // is there an active enemy in that cell?
+
                 for (Enemy e : enemies) {
                     if (!e.isActive())
                         continue;
@@ -241,7 +238,7 @@ public class EnemyManager {
         }
 
         if (freeSlots.isEmpty())
-            return; // no space in formation
+            return;
 
         Collections.shuffle(freeSlots, random);
 
@@ -274,7 +271,7 @@ public class EnemyManager {
     private void launchAttackFromFormation(Player player) {
         if (enemies.size == 0)
             return;
-        // choose only enemies that have the inFormation flag
+
         java.util.List<Enemy> formed = new java.util.ArrayList<>();
         for (Enemy e : enemies) {
             if (!e.isActive())
@@ -294,7 +291,6 @@ public class EnemyManager {
             Vector2 start = new Vector2(e.getPosition());
             Vector2 target = new Vector2(player.getPosition());
             MovementPattern divePattern = new DiveAttackPattern(start, target, diveDuration);
-
             e.setMovementPattern(divePattern);
         }
     }

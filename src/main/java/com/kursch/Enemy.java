@@ -82,7 +82,7 @@ public class Enemy {
         }
 
         // Если почти не двигается
-        if (Math.abs(dx) < 0.1f && Math.abs(dy) < 0.1f) {
+        if (Math.abs(dx) < 0.2f && Math.abs(dy) < 0.2f) {
             return directionFrames[0 + animIndex];
         }
 
@@ -177,6 +177,18 @@ public class Enemy {
         return active;
     }
 
+    public void setBaseFrame() {
+        // Сброс направления на нейтральное (вверх)
+        smoothDirection.set(0, 1);
+
+        // Сброс индекса анимации
+        animIndex = 0;
+        animationTimer = 0f;
+
+        // Устанавливаем базовый фрейм (например, вверх — индекс 0)
+        currentFrame = directionFrames[0];
+    }
+
     public void shooting() {
 
     }
@@ -188,9 +200,6 @@ public class Enemy {
     public void setMovementPattern(MovementPattern newPattern) {
         this.pattern = newPattern;
         this.time = 0f; // сбрасываем таймер, чтобы новый паттерн начал движение с нуля
-        // If we set a LeftRightPattern, that's the in-formation idle animation - keep
-        // the inFormation flag. Otherwise, switching pattern likely means leaving
-        // formation.
         if (newPattern instanceof com.kursch.patterns.LeftRightPattern) {
             this.inFormation = true;
         } else {
@@ -206,10 +215,6 @@ public class Enemy {
         return assignedSlot;
     }
 
-    /**
-     * Return whether the current movement pattern considers itself complete at the
-     * current time.
-     */
     public boolean isPatternComplete() {
         return pattern != null && pattern.isComplete(time);
     }

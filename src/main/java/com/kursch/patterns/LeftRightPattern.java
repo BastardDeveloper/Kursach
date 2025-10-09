@@ -20,6 +20,7 @@ public class LeftRightPattern implements MovementPattern {
         float angle = speed * t;
 
         // Движение влево-вправо по синусоиде
+
         float x = center.x + amplitude * MathUtils.sin(angle);
         float y = center.y; // остаётся на месте по вертикали
 
