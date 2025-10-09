@@ -5,52 +5,41 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kursch.patterns.MovementPattern;
-import java.util.Random;
-import java.util.Collections;
-import java.util.Map;
-import java.util.HashMap;
-import com.badlogic.gdx.math.MathUtils;
-// import com.kursch.patterns.ZigzagPattern;
-// import com.kursch.patterns.CirclePattern; // unused
-import com.kursch.patterns.CurvedEntryPattern;
+import com.kursch.patterns.CurvedTurnFormationPattern;
 import com.kursch.patterns.LeftRightPattern;
-// import com.kursch.patterns.InfinityPattern;
-import com.kursch.patterns.LeftRightPattern;
-// import com.kursch.patterns.Stap_wawe;
 import com.kursch.patterns.DiveAttackPattern;
+import java.util.*;
 
 public class EnemyManager {
-    private Array<Enemy> enemies;
-    private float spawnTimer = 0f;
-    private float spawnInterval = 5f; // каждые 5 секунд спавн новой группы
-    private float attackTimer = 0f;
-    private float attackInterval = 7f; // каждые 7 секунд атака из строя
 
-    private final float formationY = 700f; // централь высота для среднего ряда
-    private final int formationCols = 8; // Столбы врагов
-    private final int formationRows = 2; // ряды врагов
+    private final FitViewport viewport;
+    private final Array<Enemy> enemies;
+    private final Random random;
+
+    private final float formationY = 500f;
+    private final int formationCols = 8;
+    private final int formationRows = 2;
     private final float formationSpacing = 120f;
     private final float formationRowSpacing = 60f;
-    private final Random random = new Random();
-    private final FitViewport viewport;
 
-    private float entryDuration = 6f;
+    private float spawnTimer = 0f;
+    private float spawnInterval = 5f;
+    private float attackTimer = 0f;
+    private float attackInterval = 7f;
+
+    private float entryDuration = 7f;
     private float diveDuration = 6f;
     private float minSpawnInterval = 5f;
     private float maxSpawnInterval = 8f;
 
-    private boolean[] slotReserved;
-    private Map<Enemy, Integer> reservedMap; // занят ли слот в строю
-
-    private Map<Enemy, Float> pendingReturnTimers; // таймер через который враг должен вернутся в строй после атаки
-
-    int count = MathUtils.random(0, 10);
-    float random_Float = random.nextFloat();
-    boolean random_Bool = random.nextBoolean();
+    private final boolean[] slotReserved;
+    private final Map<Enemy, Integer> reservedMap;
+    private final Map<Enemy, Float> pendingReturnTimers;
 
     public EnemyManager(FitViewport viewport) {
         this.viewport = viewport;
-        enemies = new Array<>();
+        this.enemies = new Array<>();
+        this.random = new Random();
         this.slotReserved = new boolean[formationCols * formationRows];
         this.reservedMap = new HashMap<>();
         this.pendingReturnTimers = new HashMap<>();
@@ -61,9 +50,8 @@ public class EnemyManager {
         attackTimer += delta;
 
         if (spawnTimer >= spawnInterval) {
-            spawnRandomWave();
+            spawnRandomWave(player);
             spawnTimer = 0f;
-
             spawnInterval = minSpawnInterval + random.nextFloat() * (maxSpawnInterval - minSpawnInterval);
         }
 
@@ -72,98 +60,106 @@ public class EnemyManager {
             attackTimer = 0f;
         }
 
-        // для каждого врага
+        // Обновляем врагов
         for (Enemy e : enemies) {
-            if (e.isActive())
-                e.update(delta); // обновление
-            Vector2 start = new Vector2(e.getPosition());
+            if (!e.isActive())
+                continue;
 
-            // проверка закончил ли враг патерн атаки
-            if (e.isActive() && e.getAssignedSlot() != -1 && e.isPatternComplete()) {
-                MovementPattern cur = e.getPattern();
+            e.update(delta);
 
-                if (cur instanceof DiveAttackPattern) {
+            if (e.isPatternComplete() && e.getAssignedSlot() != -1) {
+                MovementPattern pattern = e.getPattern();
+
+                // После входа в строй — начинаем LeftRightPattern
+                if (pattern instanceof CurvedTurnFormationPattern) {
+                    int cell = e.getAssignedSlot();
+                    float slotX = (viewport.getWorldWidth() / 2f - (formationCols - 1) * formationSpacing / 2f)
+                            + (cell % formationCols) * formationSpacing;
+                    float slotY = formationY
+                            + ((cell / formationCols) - (formationRows - 1) / 2f) * formationRowSpacing;
+
+                    e.setMovementPattern(new LeftRightPattern(new Vector2(slotX, slotY), 200f, 0.5f));
+                }
+
+                // После атаки — возвращаемся в строй
+                if (pattern instanceof DiveAttackPattern) {
                     if (!pendingReturnTimers.containsKey(e)) {
                         pendingReturnTimers.put(e, 0.6f);
                     }
                 }
-
-                else if (!(cur instanceof DiveAttackPattern) && !e.isInFormation()) {
-                    int cell = e.getAssignedSlot();
-                    if (cell >= 0) {
-                        int row = cell / formationCols;
-                        int col = cell % formationCols;
-                        float slotX = (viewport.getWorldWidth() / 2f - (formationCols - 1) * formationSpacing / 2f)
-                                + col * formationSpacing;
-                        float slotY = formationY + (row - (formationRows - 1) / 2f) * formationRowSpacing;
-                        e.setBaseFrame();
-                        MovementPattern lr = new LeftRightPattern(new Vector2(slotX, slotY), 8f,
-                                1.2f + random.nextFloat() * 0.8f);
-                        e.setMovementPattern(lr);
-
-                    }
-                }
             }
         }
 
-        java.util.Iterator<Map.Entry<Enemy, Float>> prIt = pendingReturnTimers.entrySet().iterator();
+        // Обработка возврата после атаки
+        Iterator<Map.Entry<Enemy, Float>> prIt = pendingReturnTimers.entrySet().iterator();
         while (prIt.hasNext()) {
-            Map.Entry<Enemy, Float> pe = prIt.next();
-            Enemy en = pe.getKey();
-            float t = pe.getValue() - delta;
-            if (!en.isActive()) {
+            Map.Entry<Enemy, Float> entry = prIt.next();
+            Enemy e = entry.getKey();
+            float t = entry.getValue() - delta;
+
+            if (!e.isActive()) {
                 prIt.remove();
                 continue;
             }
+
             if (t <= 0f) {
-                int cell = en.getAssignedSlot();
+                int cell = e.getAssignedSlot();
                 if (cell >= 0) {
-                    int row = cell / formationCols;
-                    int col = cell % formationCols;
                     float slotX = (viewport.getWorldWidth() / 2f - (formationCols - 1) * formationSpacing / 2f)
-                            + col * formationSpacing;
-                    float slotY = formationY + (row - (formationRows - 1) / 2f) * formationRowSpacing;
-                    MovementPattern returnPattern = new CurvedEntryPattern(new Vector2(en.getPosition()),
-                            new Vector2(slotX, slotY), entryDuration / 1.5f);
-                    en.setMovementPattern(returnPattern);
+                            + (cell % formationCols) * formationSpacing;
+                    float slotY = formationY
+                            + ((cell / formationCols) - (formationRows - 1) / 2f) * formationRowSpacing;
+
+                    // ✅ ИСПРАВЛЕНО: правильный порядок параметров
+                    int returnDirection = e.getPosition().x < slotX ? 1 : -1;
+                    e.setMovementPattern(
+                            new CurvedTurnFormationPattern(
+                                    new Vector2(e.getPosition()),
+                                    player.getPosition(),
+                                    new Vector2(slotX, slotY),
+                                    entryDuration / 1.5f, // duration
+                                    120f, // turnRadius (увеличен!)
+                                    returnDirection // direction (-1 или 1)
+                            ));
                 }
                 prIt.remove();
             } else {
-                pe.setValue(t);
+                entry.setValue(t);
             }
         }
 
-        float margin = 200f;
+        // Удаление врагов за пределами экрана
+        float margin = 2000f;
         float worldW = viewport.getWorldWidth();
         float worldH = viewport.getWorldHeight();
-        for (Enemy e : enemies) {
-            if (!e.isActive())
+
+        for (int i = enemies.size - 1; i >= 0; i--) {
+            Enemy e = enemies.get(i);
+            if (!e.isActive()) {
+                Integer sObj = reservedMap.remove(e);
+                int s = (sObj != null) ? sObj : -1;
+                if (s >= 0 && s < slotReserved.length)
+                    slotReserved[s] = false;
+                enemies.removeIndex(i);
                 continue;
+            }
             Vector2 p = e.getPosition();
             if (p.x < -margin || p.x > worldW + margin || p.y < -margin || p.y > worldH + margin) {
-
-                if (reservedMap.containsKey(e)) {
-                    int s = reservedMap.remove(e);
-                    if (s >= 0 && s < slotReserved.length)
-                        slotReserved[s] = false;
-                }
+                Integer sObj = reservedMap.remove(e);
+                int s = (sObj != null) ? sObj : -1;
+                if (s >= 0 && s < slotReserved.length)
+                    slotReserved[s] = false;
                 e.destroy();
             }
         }
 
-        java.util.Iterator<Map.Entry<Enemy, Integer>> it = reservedMap.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<Enemy, Integer> entry = it.next();
-            Enemy e = entry.getKey();
-            int s = entry.getValue();
-            if (!e.isActive()) {
-                if (s >= 0 && s < slotReserved.length)
-                    slotReserved[s] = false;
-                it.remove();
+        // Обработка столкновений с пулями
+        for (int i = player.getPlayerBullets().size - 1; i >= 0; i--) {
+            Bullet b = player.getPlayerBullets().get(i);
+            if (!b.isActive()) {
+                player.getPlayerBullets().removeIndex(i);
+                continue;
             }
-        }
-
-        for (Bullet b : player.getPlayerBullets()) {
             for (Enemy e : enemies) {
                 if (e.isActive() && b.getBounds().overlaps(e.getBounds())) {
                     e.destroy();
@@ -172,96 +168,69 @@ public class EnemyManager {
             }
         }
 
+        // Столкновение с игроком
         for (Enemy e : enemies) {
             if (e.isActive() && player.getBounds().overlaps(e.getBounds())) {
                 player.destroy();
             }
         }
-
-        // удаление неактивных врагов
-        for (int i = enemies.size - 1; i >= 0; i--) {
-            if (!enemies.get(i).isActive()) {
-                Enemy dead = enemies.removeIndex(i);
-                if (reservedMap.containsKey(dead)) {
-                    int s = reservedMap.remove(dead);
-                    if (s >= 0 && s < slotReserved.length)
-                        slotReserved[s] = false;
-                }
-            }
-        }
-
-        // удаление неактивных пуль игрока
-        for (int i = player.getPlayerBullets().size - 1; i >= 0; i--) {
-            if (!player.getPlayerBullets().get(i).isActive()) {
-                player.getPlayerBullets().removeIndex(i);
-            }
-        }
     }
 
-    // метод спавна врагов
-    private void spawnRandomWave() {
-        boolean[] occupied = new boolean[formationCols];
-        for (Enemy e : enemies) {
-            if (!e.isActive())
-                continue;
-            Vector2 pos = e.getPosition();
-            for (int c = 0; c < formationCols; c++) {
-                float slotX = (viewport.getWorldWidth() / 2f - (formationCols - 1) * formationSpacing / 2f)
-                        + c * formationSpacing;
-                if (Math.abs(pos.x - slotX) < formationSpacing * 0.4f && Math.abs(pos.y - formationY) < 20f) {
-                    occupied[c] = true;
-                }
-            }
-        }
-
-        java.util.List<Integer> freeSlots = new java.util.ArrayList<>();
+    private void spawnRandomWave(Player player) {
+        List<Integer> freeSlots = new ArrayList<>();
         for (int r = 0; r < formationRows; r++) {
             for (int c = 0; c < formationCols; c++) {
                 int cellId = r * formationCols + c;
-                boolean occ = false;
-
-                for (Enemy e : enemies) {
-                    if (!e.isActive())
-                        continue;
-                    Vector2 pos = e.getPosition();
-                    float slotX = (viewport.getWorldWidth() / 2f - (formationCols - 1) * formationSpacing / 2f)
-                            + c * formationSpacing;
-                    float slotY = formationY + (r - (formationRows - 1) / 2f) * formationRowSpacing;
-                    if (Math.abs(pos.x - slotX) < formationSpacing * 0.4f && Math.abs(pos.y - slotY) < 20f) {
-                        occ = true;
-                        break;
-                    }
-                }
-                if (!occ && !slotReserved[cellId])
+                if (!slotReserved[cellId])
                     freeSlots.add(cellId);
             }
         }
-
         if (freeSlots.isEmpty())
             return;
 
         Collections.shuffle(freeSlots, random);
+        int spawnCount = Math.min(3 + random.nextInt(4), freeSlots.size());
 
-        int desired = 3 + random.nextInt(4);
-        int spawnCount = Math.min(desired, freeSlots.size());
+        // Определяем стартовую позицию для "сосисочки"
+        boolean fromLeft = random.nextBoolean();
+        float startX = fromLeft ? -100f : viewport.getWorldWidth() + 100f;
+        float startY = viewport.getWorldHeight() + 50f;
+        int direction = fromLeft ? 1 : -1;
 
-        float startX = random.nextBoolean() ? -100f : viewport.getWorldWidth() + 100f;
-        float startY = random.nextBoolean() ? viewport.getWorldHeight() + 100f : -100f;
+        // Расстояние между врагами в цепочке
+        float chainSpacing = 60f;
 
         for (int i = 0; i < spawnCount; i++) {
             int cell = freeSlots.get(i);
-
             slotReserved[cell] = true;
+
             int row = cell / formationCols;
             int col = cell % formationCols;
+
             float targetX = (viewport.getWorldWidth() / 2f - (formationCols - 1) * formationSpacing / 2f)
                     + col * formationSpacing;
             float targetY = formationY + (row - (formationRows - 1) / 2f) * formationRowSpacing;
 
-            MovementPattern entryPattern = new CurvedEntryPattern(new Vector2(startX, startY),
-                    new Vector2(targetX, targetY), entryDuration);
+            // Каждый следующий враг стартует чуть позже по Y (сосисочка)
+            float enemyStartX = startX;
+            float enemyStartY = startY - i * chainSpacing;
 
-            Enemy newE = new blueRed_Bazz_Enemy(entryPattern, startX, startY);
+            // Добавляем задержку для каждого врага в цепочке
+            float spawnDelay = i * 0.15f; // 0.15 секунды между спавном каждого врага
+
+            MovementPattern entryPattern = new CurvedTurnFormationPattern(
+                    new Vector2(enemyStartX, enemyStartY),
+                    player.getPosition(),
+                    new Vector2(targetX, targetY),
+                    entryDuration + spawnDelay, // увеличиваем длительность с учетом задержки
+                    150f, // turnRadius
+                    direction);
+
+            Enemy newE = new blueRed_Bazz_Enemy(entryPattern, enemyStartX, enemyStartY);
+
+            // Если твой Enemy класс поддерживает задержку спавна
+            newE.setSpawnDelay(spawnDelay);
+
             enemies.add(newE);
             reservedMap.put(newE, cell);
             newE.setAssignedSlot(cell);
@@ -269,17 +238,11 @@ public class EnemyManager {
     }
 
     private void launchAttackFromFormation(Player player) {
-        if (enemies.size == 0)
-            return;
-
-        java.util.List<Enemy> formed = new java.util.ArrayList<>();
+        List<Enemy> formed = new ArrayList<>();
         for (Enemy e : enemies) {
-            if (!e.isActive())
-                continue;
-            if (e.isInFormation())
+            if (e.isActive() && e.isInFormation())
                 formed.add(e);
         }
-
         if (formed.isEmpty())
             return;
 
@@ -290,8 +253,7 @@ public class EnemyManager {
             Enemy e = formed.get(i);
             Vector2 start = new Vector2(e.getPosition());
             Vector2 target = new Vector2(player.getPosition());
-            MovementPattern divePattern = new DiveAttackPattern(start, target, diveDuration);
-            e.setMovementPattern(divePattern);
+            e.setMovementPattern(new DiveAttackPattern(start, target, diveDuration));
         }
     }
 
@@ -305,11 +267,8 @@ public class EnemyManager {
     }
 
     public void dispose() {
-        for (Enemy e : enemies) {
+        for (Enemy e : enemies)
             e.dispose();
-
-        }
         blueRed_Bazz_Enemy.disposeStatic();
-
     }
 }

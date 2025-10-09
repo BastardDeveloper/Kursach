@@ -24,9 +24,14 @@ public class Enemy {
     private int animIndex = 0;
     private final float animationSpeed = 0.5f;
 
-    // Добавляем сглаженное направление
-    private Vector2 smoothDirection = new Vector2(0, 1); // начальное направление - вверх
-    private final float directionSmoothness = 0.15f; // чем меньше значение, тем плавнее (0.05-0.2)
+    // Сглаженное направление
+    private Vector2 smoothDirection = new Vector2(0, 1);
+    private final float directionSmoothness = 0.15f;
+
+    // Задержка спавна
+    private float spawnDelay = 0f;
+    private float spawnTimer = 0f;
+    private boolean isSpawning = false;
 
     public Enemy(TextureRegion[] directionFrames, MovementPattern pattern, float x, float y) {
         this.directionFrames = directionFrames;
@@ -39,34 +44,46 @@ public class Enemy {
     public void update(float delta) {
         if (!active)
             return;
+
+        // Обработка задержки спавна
+        if (isSpawning) {
+            spawnTimer += delta;
+            if (spawnTimer >= spawnDelay) {
+                isSpawning = false;
+            } else {
+                return; // Пропускаем обновление пока не истекла задержка
+            }
+        }
+
         time += delta;
         prevPosition.set(position);
         Vector2 newPos = pattern.getPosition(time);
         position.set(newPos);
 
-        // mark as in-formation if the current pattern declares completion
+        // Отмечаем что враг в формации если паттерн завершен
         if (!inFormation && pattern.isComplete(time)) {
             inFormation = true;
         }
 
-        // Вычисляем мгновенное направление
+        // Вычисляем мгновенное направление движения
         float dx = position.x - prevPosition.x;
         float dy = position.y - prevPosition.y;
 
-        // Сглаживаем направление (lerp)
+        // Сглаживаем направление через lerp
         Vector2 instantDirection = new Vector2(dx, dy);
-        if (instantDirection.len2() > 0.01f) { // только если есть реальное движение
-            instantDirection.nor(); // нормализуем
+        if (instantDirection.len2() > 0.01f) {
+            instantDirection.nor();
             smoothDirection.lerp(instantDirection, directionSmoothness);
-            smoothDirection.nor(); // нормализуем результат
+            smoothDirection.nor();
         }
 
         currentFrame = getFrameForDirection(smoothDirection.x, smoothDirection.y);
     }
 
     public void draw(SpriteBatch batch) {
-        if (!active)
+        if (!active || isSpawning)
             return;
+
         batch.draw(
                 currentFrame,
                 position.x, position.y,
@@ -82,83 +99,51 @@ public class Enemy {
         }
 
         // Если почти не двигается
-        if (Math.abs(dx) < 0.2f && Math.abs(dy) < 0.2f) {
+        if (Math.abs(dx) < 0.5f && Math.abs(dy) < 0.5f) {
             return directionFrames[0 + animIndex];
         }
 
         // Вычисляем угол направления в градусах (0° = вправо, 90° = вверх)
         float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
-        // Нормализуем угол к диапазону [0, 360)
         if (angle < 0)
             angle += 360;
 
         int baseIndex;
 
         // Определяем направление по секторам
-        // Вверх: 75° - 105°
         if (angle >= 75 && angle < 105) {
             baseIndex = 0; // вверх
-        }
-        // Вниз: 255° - 285°
-        else if (angle >= 255 && angle < 285) {
+        } else if (angle >= 255 && angle < 285) {
             baseIndex = 2; // вниз
-        }
-        // Влево полностью: 165° - 195°
-        else if (angle >= 165 && angle < 195) {
+        } else if (angle >= 165 && angle < 195) {
             baseIndex = 8; // полностью влево
-        }
-        // Влево верх средне: 120° - 150°
-        else if (angle >= 120 && angle < 150) {
+        } else if (angle >= 120 && angle < 150) {
             baseIndex = 6; // влево средне (верх)
-        }
-        // Влево верх слабо: 105° - 120°
-        else if (angle >= 105 && angle < 120) {
+        } else if (angle >= 105 && angle < 120) {
             baseIndex = 4; // влево слабо (верх)
-        }
-        // Влево низ средне: 210° - 240°
-        else if (angle >= 210 && angle < 240) {
+        } else if (angle >= 210 && angle < 240) {
             baseIndex = 18; // влево средне (низ)
-        }
-        // Влево низ слабо: 240° - 255°
-        else if (angle >= 240 && angle < 255) {
+        } else if (angle >= 240 && angle < 255) {
             baseIndex = 16; // влево слабо (низ)
-        }
-        // Влево полностью низ: 195° - 210°
-        else if (angle >= 195 && angle < 210) {
+        } else if (angle >= 195 && angle < 210) {
             baseIndex = 20; // полностью влево (низ)
-        }
-        // Вправо полностью: 345° - 15°
-        else if (angle >= 345 || angle < 15) {
+        } else if (angle >= 345 || angle < 15) {
             baseIndex = 14; // полностью вправо
-        }
-        // Вправо верх средне: 30° - 60°
-        else if (angle >= 30 && angle < 60) {
+        } else if (angle >= 30 && angle < 60) {
             baseIndex = 12; // вправо средне (верх)
-        }
-        // Вправо верх слабо: 60° - 75°
-        else if (angle >= 60 && angle < 75) {
+        } else if (angle >= 60 && angle < 75) {
             baseIndex = 10; // вправо слабо (верх)
-        }
-        // Вправо низ средне: 300° - 330°
-        else if (angle >= 300 && angle < 330) {
+        } else if (angle >= 300 && angle < 330) {
             baseIndex = 24; // вправо средне (низ)
-        }
-        // Вправо низ слабо: 285° - 300°
-        else if (angle >= 285 && angle < 300) {
+        } else if (angle >= 285 && angle < 300) {
             baseIndex = 22; // вправо слабо (низ)
-        }
-        // Вправо полностью низ: 330° - 345°
-        else if (angle >= 330 && angle < 345) {
+        } else if (angle >= 330 && angle < 345) {
             baseIndex = 26; // полностью вправо (низ)
-        }
-        // Диагонали (заполняем промежутки)
-        else if (angle >= 15 && angle < 30) {
+        } else if (angle >= 15 && angle < 30) {
             baseIndex = 14; // вправо
         } else if (angle >= 150 && angle < 165) {
             baseIndex = 8; // влево
-        }
-        // По умолчанию
-        else {
+        } else {
             baseIndex = 0;
         }
 
@@ -178,19 +163,14 @@ public class Enemy {
     }
 
     public void setBaseFrame() {
-        // Сброс направления на нейтральное (вверх)
         smoothDirection.set(0, 1);
-
-        // Сброс индекса анимации
         animIndex = 0;
         animationTimer = 0f;
-
-        // Устанавливаем базовый фрейм (например, вверх — индекс 0)
         currentFrame = directionFrames[0];
     }
 
     public void shooting() {
-
+        // Логика стрельбы
     }
 
     public Vector2 getPosition() {
@@ -199,7 +179,7 @@ public class Enemy {
 
     public void setMovementPattern(MovementPattern newPattern) {
         this.pattern = newPattern;
-        this.time = 0f; // сбрасываем таймер, чтобы новый паттерн начал движение с нуля
+        this.time = 0f;
         if (newPattern instanceof com.kursch.patterns.LeftRightPattern) {
             this.inFormation = true;
         } else {
@@ -227,7 +207,19 @@ public class Enemy {
         return inFormation;
     }
 
+    public void setSpawnDelay(float delay) {
+        this.spawnDelay = delay;
+        this.spawnTimer = 0f;
+        this.isSpawning = delay > 0;
+    }
+
+    public boolean isSpawning() {
+        return isSpawning;
+    }
+
     public void dispose() {
-        currentFrame.getTexture().dispose();
+        if (currentFrame != null && currentFrame.getTexture() != null) {
+            currentFrame.getTexture().dispose();
+        }
     }
 }
