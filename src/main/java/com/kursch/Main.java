@@ -21,7 +21,7 @@ public class Main extends Game {
     @Override
     public void create() {
         spriteBatch = new SpriteBatch();
-        viewport = new FitViewport(1600, 900);
+        viewport = new FitViewport(700, 1000);
         setScreen(new MainMenuScreen(this));
         background = new Background(viewport);
         gameScreen = new GameScreen(this);

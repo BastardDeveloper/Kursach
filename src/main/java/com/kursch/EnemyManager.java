@@ -16,25 +16,45 @@ public class EnemyManager {
     private final Array<Enemy> enemies;
     private final Random random;
 
-    private final float formationY = 500f;
+    private final float formationY = 700f;
     private final int formationCols = 8;
     private final int formationRows = 2;
-    private final float formationSpacing = 120f;
+    private final float formationSpacing = 50f;
     private final float formationRowSpacing = 60f;
 
     private float spawnTimer = 0f;
     private float spawnInterval = 5f;
     private float attackTimer = 0f;
-    private float attackInterval = 7f;
+    private float attackInterval = 5f;
 
-    private float entryDuration = 7f;
+    private float entryDuration = 5f;
     private float diveDuration = 6f;
-    private float minSpawnInterval = 5f;
-    private float maxSpawnInterval = 8f;
+
+    // Базовые интервалы
+    private final float baseMinSpawnInterval = 5f;
+    private final float baseMaxSpawnInterval = 8f;
+    private final float baseAttackInterval = 5f;
+
+    // Минимальные интервалы (не опускаться ниже)
+    private final float minAllowedSpawnInterval = 1.5f;
+    private final float minAllowedAttackInterval = 2f;
+
+    // Базовое количество врагов
+    private final int baseMinSpawn = 3;
+    private final int baseMaxSpawn = 6;
+    private final int baseMinAttackers = 1;
+    private final int baseMaxAttackers = 3;
 
     private final boolean[] slotReserved;
     private final Map<Enemy, Integer> reservedMap;
     private final Map<Enemy, Float> pendingReturnTimers;
+
+    // Система ускорения игры
+    private float gameTime = 0f;
+    private float speedMultiplier = 1f;
+    private final float baseSpeedMultiplier = 1f;
+    private final float maxSpeedMultiplier = 2.5f;
+    private final float speedIncreaseRate = 0.1f; // 10% каждые 10 секунд
 
     public EnemyManager(FitViewport viewport) {
         this.viewport = viewport;
@@ -46,18 +66,33 @@ public class EnemyManager {
     }
 
     public void update(float delta, Player player) {
+        // Обновляем игровое время и множитель скорости
+        gameTime += delta;
+        speedMultiplier = Math.min(maxSpeedMultiplier,
+                baseSpeedMultiplier + (gameTime / 10f) * speedIncreaseRate);
+
         spawnTimer += delta;
         attackTimer += delta;
+
+        // Динамические интервалы - уменьшаются со временем
+        float currentMinSpawnInterval = Math.max(minAllowedSpawnInterval,
+                baseMinSpawnInterval / speedMultiplier);
+        float currentMaxSpawnInterval = Math.max(minAllowedSpawnInterval + 1f,
+                baseMaxSpawnInterval / speedMultiplier);
+        float currentAttackInterval = Math.max(minAllowedAttackInterval,
+                baseAttackInterval / speedMultiplier);
 
         if (spawnTimer >= spawnInterval) {
             spawnRandomWave(player);
             spawnTimer = 0f;
-            spawnInterval = minSpawnInterval + random.nextFloat() * (maxSpawnInterval - minSpawnInterval);
+            spawnInterval = currentMinSpawnInterval +
+                    random.nextFloat() * (currentMaxSpawnInterval - currentMinSpawnInterval);
         }
 
         if (attackTimer >= attackInterval) {
             launchAttackFromFormation(player);
             attackTimer = 0f;
+            attackInterval = currentAttackInterval;
         }
 
         // Обновляем врагов
@@ -65,12 +100,12 @@ public class EnemyManager {
             if (!e.isActive())
                 continue;
 
-            e.update(delta);
+            e.update(delta * speedMultiplier);
 
             if (e.isPatternComplete() && e.getAssignedSlot() != -1) {
                 MovementPattern pattern = e.getPattern();
 
-                // После входа в строй — начинаем LeftRightPattern
+                // После входа в строй — начинаем LeftRightPattern с синхронизацией
                 if (pattern instanceof CurvedTurnFormationPattern) {
                     int cell = e.getAssignedSlot();
                     float slotX = (viewport.getWorldWidth() / 2f - (formationCols - 1) * formationSpacing / 2f)
@@ -78,13 +113,17 @@ public class EnemyManager {
                     float slotY = formationY
                             + ((cell / formationCols) - (formationRows - 1) / 2f) * formationRowSpacing;
 
-                    e.setMovementPattern(new LeftRightPattern(new Vector2(slotX, slotY), 200f, 0.5f));
+                    LeftRightPattern leftRightPattern = new LeftRightPattern(
+                            new Vector2(slotX, slotY),
+                            100f,
+                            0.4f * speedMultiplier);
+                    e.setMovementPattern(leftRightPattern);
                 }
 
                 // После атаки — возвращаемся в строй
                 if (pattern instanceof DiveAttackPattern) {
                     if (!pendingReturnTimers.containsKey(e)) {
-                        pendingReturnTimers.put(e, 0.6f);
+                        pendingReturnTimers.put(e, 0.6f / speedMultiplier);
                     }
                 }
             }
@@ -110,17 +149,15 @@ public class EnemyManager {
                     float slotY = formationY
                             + ((cell / formationCols) - (formationRows - 1) / 2f) * formationRowSpacing;
 
-                    // ✅ ИСПРАВЛЕНО: правильный порядок параметров
                     int returnDirection = e.getPosition().x < slotX ? 1 : -1;
                     e.setMovementPattern(
                             new CurvedTurnFormationPattern(
                                     new Vector2(e.getPosition()),
                                     player.getPosition(),
                                     new Vector2(slotX, slotY),
-                                    entryDuration / 1.5f, // duration
-                                    120f, // turnRadius (увеличен!)
-                                    returnDirection // direction (-1 или 1)
-                            ));
+                                    (entryDuration / 1.5f) / speedMultiplier,
+                                    120f,
+                                    returnDirection));
                 }
                 prIt.remove();
             } else {
@@ -189,7 +226,13 @@ public class EnemyManager {
             return;
 
         Collections.shuffle(freeSlots, random);
-        int spawnCount = Math.min(3 + random.nextInt(4), freeSlots.size());
+
+        // Увеличиваем количество врагов со временем
+        int maxSpawnCount = (int) Math.min(baseMaxSpawn + (gameTime / 20f), formationCols);
+        int minSpawnCount = Math.min(baseMinSpawn, maxSpawnCount);
+        int spawnCount = Math.min(
+                minSpawnCount + random.nextInt(maxSpawnCount - minSpawnCount + 1),
+                freeSlots.size());
 
         // Определяем стартовую позицию для "сосисочки"
         boolean fromLeft = random.nextBoolean();
@@ -198,7 +241,7 @@ public class EnemyManager {
         int direction = fromLeft ? 1 : -1;
 
         // Расстояние между врагами в цепочке
-        float chainSpacing = 60f;
+        float chainSpacing = 30f;
 
         for (int i = 0; i < spawnCount; i++) {
             int cell = freeSlots.get(i);
@@ -211,24 +254,19 @@ public class EnemyManager {
                     + col * formationSpacing;
             float targetY = formationY + (row - (formationRows - 1) / 2f) * formationRowSpacing;
 
-            // Каждый следующий враг стартует чуть позже по Y (сосисочка)
             float enemyStartX = startX;
             float enemyStartY = startY - i * chainSpacing;
-
-            // Добавляем задержку для каждого врага в цепочке
-            float spawnDelay = i * 0.15f; // 0.15 секунды между спавном каждого врага
+            float spawnDelay = i * 0.15f;
 
             MovementPattern entryPattern = new CurvedTurnFormationPattern(
                     new Vector2(enemyStartX, enemyStartY),
                     player.getPosition(),
                     new Vector2(targetX, targetY),
-                    entryDuration + spawnDelay, // увеличиваем длительность с учетом задержки
-                    150f, // turnRadius
+                    (entryDuration + spawnDelay) / speedMultiplier,
+                    150f,
                     direction);
 
             Enemy newE = new blueRed_Bazz_Enemy(entryPattern, enemyStartX, enemyStartY);
-
-            // Если твой Enemy класс поддерживает задержку спавна
             newE.setSpawnDelay(spawnDelay);
 
             enemies.add(newE);
@@ -246,14 +284,20 @@ public class EnemyManager {
         if (formed.isEmpty())
             return;
 
-        int attackers = 1 + random.nextInt(Math.min(3, formed.size()));
+        // Увеличиваем количество атакующих со временем
+        int maxAttackers = Math.min(
+                (int) (baseMaxAttackers + (gameTime / 30f)),
+                Math.min(5, formed.size()));
+        int minAttackers = Math.min(baseMinAttackers, maxAttackers);
+        int attackers = minAttackers + random.nextInt(maxAttackers - minAttackers + 1);
+
         Collections.shuffle(formed, random);
 
         for (int i = 0; i < attackers; i++) {
             Enemy e = formed.get(i);
             Vector2 start = new Vector2(e.getPosition());
             Vector2 target = new Vector2(player.getPosition());
-            e.setMovementPattern(new DiveAttackPattern(start, target, diveDuration));
+            e.setMovementPattern(new DiveAttackPattern(start, target, diveDuration / speedMultiplier));
         }
     }
 
@@ -264,6 +308,14 @@ public class EnemyManager {
 
     public Array<Enemy> getEnemies() {
         return enemies;
+    }
+
+    public float getSpeedMultiplier() {
+        return speedMultiplier;
+    }
+
+    public float getGameTime() {
+        return gameTime;
     }
 
     public void dispose() {

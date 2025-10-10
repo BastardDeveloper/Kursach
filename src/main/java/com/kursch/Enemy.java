@@ -18,7 +18,7 @@ public class Enemy {
     private int assignedSlot = -1;
     private Vector2 position = new Vector2();
     private Vector2 prevPosition = new Vector2();
-    private float width = 30, height = 30;
+    private float width = 40, height = 40;
 
     private float animationTimer = 0f;
     private int animIndex = 0;

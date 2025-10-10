@@ -18,7 +18,7 @@ public class Background {
 
     public void update(float delta, float speed) {
         scrollY += speed * delta;
-        if (scrollY > 900)
+        if (scrollY > 1000)
             scrollY = 0;
     }
 

@@ -13,11 +13,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kursch.Main;
 
 public class GameOverScreen implements Screen {
-    private final Main game;
     private final Stage stage;
     private final Skin skin;
     private final SpriteBatch batch;
@@ -32,14 +30,14 @@ public class GameOverScreen implements Screen {
 
     public GameOverScreen(final Main game, GameScreen previousScreen, int score) {
 
-        this.game = game;
         this.previousScreen = previousScreen;
         this.score = score;
 
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
 
-        stage = new Stage(new FitViewport(1600, 900));
+        stage = new Stage(game.viewport, game.spriteBatch);
+
         Gdx.input.setInputProcessor(stage);
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
