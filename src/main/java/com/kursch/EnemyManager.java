@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kursch.patterns.MovementPattern;
+import com.kursch.menu.GameScreen;
 import com.kursch.patterns.CurvedTurnFormationPattern;
 import com.kursch.patterns.LeftRightPattern;
 import com.kursch.patterns.DiveAttackPattern;
@@ -15,6 +16,7 @@ public class EnemyManager {
     private final FitViewport viewport;
     private final Array<Enemy> enemies;
     private final Random random;
+    private GameScreen gameScreen;
 
     private final float formationY = 700f;
     private final int formationCols = 8;
@@ -56,7 +58,8 @@ public class EnemyManager {
     private final float maxSpeedMultiplier = 2.5f;
     private final float speedIncreaseRate = 0.1f; // 10% каждые 10 секунд
 
-    public EnemyManager(FitViewport viewport) {
+    public EnemyManager(FitViewport viewport, GameScreen gameScreen) {
+        this.gameScreen = gameScreen;
         this.viewport = viewport;
         this.enemies = new Array<>();
         this.random = new Random();
@@ -166,7 +169,7 @@ public class EnemyManager {
         }
 
         // Удаление врагов за пределами экрана
-        float margin = 2000f;
+        float margin = 1000f;
         float worldW = viewport.getWorldWidth();
         float worldH = viewport.getWorldHeight();
 
@@ -200,6 +203,7 @@ public class EnemyManager {
             for (Enemy e : enemies) {
                 if (e.isActive() && b.getBounds().overlaps(e.getBounds())) {
                     e.destroy();
+                    gameScreen.addScore(e.getPoints());
                     b.destroy();
                 }
             }

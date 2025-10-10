@@ -15,6 +15,7 @@ public class blueRed_Bazz_Enemy extends Enemy {
         pixmap.dispose();
         enemyAtlas.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         enemyAtlas.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
+
     }
 
     // --- UP ---
@@ -117,7 +118,7 @@ public class blueRed_Bazz_Enemy extends Enemy {
     };
 
     public blueRed_Bazz_Enemy(MovementPattern pattern, float x, float y) {
-        super(directionFrames, pattern, x, y);
+        super(directionFrames, pattern, x, y, 100);
     }
 
     public static void disposeStatic() {

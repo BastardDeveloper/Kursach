@@ -15,6 +15,7 @@ public class Enemy {
     private boolean active = true;
     private boolean inFormation = false;
     private float time;
+    private int points;
     private int assignedSlot = -1;
     private Vector2 position = new Vector2();
     private Vector2 prevPosition = new Vector2();
@@ -33,9 +34,10 @@ public class Enemy {
     private float spawnTimer = 0f;
     private boolean isSpawning = false;
 
-    public Enemy(TextureRegion[] directionFrames, MovementPattern pattern, float x, float y) {
+    public Enemy(TextureRegion[] directionFrames, MovementPattern pattern, float x, float y, int points) {
         this.directionFrames = directionFrames;
         this.pattern = pattern;
+        this.points = points;
         this.position.set(x, y);
         this.prevPosition.set(x, y);
         this.currentFrame = directionFrames[0];
@@ -193,6 +195,10 @@ public class Enemy {
 
     public int getAssignedSlot() {
         return assignedSlot;
+    }
+
+    public int getPoints() {
+        return points;
     }
 
     public boolean isPatternComplete() {

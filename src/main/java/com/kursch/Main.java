@@ -26,7 +26,7 @@ public class Main extends Game {
         background = new Background(viewport);
         gameScreen = new GameScreen(this);
         player = new Player(viewport, gameScreen);
-        enemyManager = new EnemyManager(viewport);
+        enemyManager = new EnemyManager(viewport, gameScreen);
 
     }
 

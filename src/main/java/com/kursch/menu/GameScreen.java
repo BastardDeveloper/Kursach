@@ -30,10 +30,10 @@ public class GameScreen implements Screen {
         this.game = game;
 
         font = new BitmapFont();
-        font.getData().setScale(10f);
+        font.getData().setScale(5f);
 
         pauseFont = new BitmapFont();
-        pauseFont.getData().setScale(8f);
+        pauseFont.getData().setScale(5f);
         pauseFont.setColor(Color.WHITE);
 
         shapeRenderer = new ShapeRenderer();
@@ -43,7 +43,7 @@ public class GameScreen implements Screen {
         gameMusic.setVolume(0f);
 
         game.player = new Player(game.viewport, this);
-        game.enemyManager = new EnemyManager(game.viewport);
+        game.enemyManager = new EnemyManager(game.viewport, this);
         game.background = new Background(game.viewport);
 
         score = 0;
@@ -99,7 +99,7 @@ public class GameScreen implements Screen {
         game.background.draw(game.spriteBatch);
         game.player.draw(game.spriteBatch);
         game.enemyManager.draw(game.spriteBatch);
-        font.draw(game.spriteBatch, "Score: " + score, 10, 890);
+        font.draw(game.spriteBatch, "Score: " + score, 10, 900);
         game.spriteBatch.end();
 
         // Если пауза, рисуем оверлей с кнопками
@@ -127,9 +127,9 @@ public class GameScreen implements Screen {
         float centerY = game.viewport.getWorldHeight() / 2;
 
         pauseFont.getData().setScale(5f);
-        pauseFont.draw(game.spriteBatch, "PAUSE", centerX - 80, centerY + 120);
-        pauseFont.draw(game.spriteBatch, "ESC - Continue", centerX - 140, centerY + 40);
-        pauseFont.draw(game.spriteBatch, "M - Main Menu", centerX - 140, centerY - 40);
+        pauseFont.draw(game.spriteBatch, "PAUSE", centerX - 300, centerY + 120);
+        pauseFont.draw(game.spriteBatch, "ESC - Continue", centerX - 300, centerY + 40);
+        pauseFont.draw(game.spriteBatch, "M - Main Menu", centerX - 300, centerY - 40);
 
         game.spriteBatch.end();
 
