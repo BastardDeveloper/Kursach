@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.kursch.Main;
 
 public class GameOverScreen implements Screen {
+    private final Main game;
     private final Stage stage;
     private final Skin skin;
     private final SpriteBatch batch;
@@ -30,6 +31,7 @@ public class GameOverScreen implements Screen {
 
     public GameOverScreen(final Main game, GameScreen previousScreen, int score) {
 
+        this.game = game;
         this.previousScreen = previousScreen;
         this.score = score;
 
@@ -109,7 +111,7 @@ public class GameOverScreen implements Screen {
 
         // Рисуем предыдущий экран (замороженный)
         if (previousScreen != null) {
-            previousScreen.render(0); // delta = 0 чтобы заморозить анимации
+            previousScreen.render(0);
         }
 
         // Полупрозрачный затемняющий слой

@@ -14,9 +14,11 @@
         <maven.compiler.target>23</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <libgdx.version>1.13.5</libgdx.version>
+        <javacv.version>1.5.10</javacv.version>
     </properties>
 
     <dependencies>
+
         <!-- LibGDX Core -->
         <dependency>
             <groupId>com.badlogicgames.gdx</groupId>
