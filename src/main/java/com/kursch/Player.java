@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kursch.menu.GameScreen;
+import com.badlogic.gdx.audio.Sound;
 
 public class Player {
 
@@ -64,11 +65,14 @@ public class Player {
     }
 
     private void shoot() {
+        Sound bulletSound = Gdx.audio.newSound(Gdx.files.internal("BulletSound.mp3"));
+        Bullet.loadSound(bulletSound);
         Sprite bulletSprite = new Sprite(bulletTexture);
         bulletSprite.setSize(20, 37);
         float startX = (playerSprite.getX() + (playerSprite.getWidth() - bulletSprite.getWidth()) / 2) - 4;
         float startY = playerSprite.getY() + playerSprite.getHeight();
-        bullets.add(new Bullet(bulletSprite, startX, startY));
+        Vector2 direction = new Vector2(0, 1); // напрям тільки вгору
+        bullets.add(new Bullet(bulletSprite, startX, startY, direction, 2000f));
     }
 
     public void draw(SpriteBatch batch) {

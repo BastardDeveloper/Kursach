@@ -1,14 +1,19 @@
 package com.kursch;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.kursch.patterns.MovementPattern;
 
 public class Enemy {
 
+    private Array<Bullet> bullets;
+    private TextureRegion bulletTexture;
     private TextureRegion[] directionFrames;
     private TextureRegion currentFrame;
     private MovementPattern pattern;
@@ -41,6 +46,9 @@ public class Enemy {
         this.position.set(x, y);
         this.prevPosition.set(x, y);
         this.currentFrame = directionFrames[0];
+        bullets = new Array<>();
+        bulletTexture = new TextureRegion(new Texture("ВеселаяНарезка.png"), 312, 139, 4, 9);
+
     }
 
     public void update(float delta) {
@@ -80,6 +88,12 @@ public class Enemy {
         }
 
         currentFrame = getFrameForDirection(smoothDirection.x, smoothDirection.y);
+
+        // обновляем снаряды врага
+        for (Bullet b : bullets) {
+            b.update(delta);
+        }
+
     }
 
     public void draw(SpriteBatch batch) {
@@ -90,6 +104,9 @@ public class Enemy {
                 currentFrame,
                 position.x, position.y,
                 width, height);
+        for (Bullet b : bullets) {
+            b.draw(batch);
+        }
     }
 
     private TextureRegion getFrameForDirection(float dx, float dy) {
@@ -171,8 +188,21 @@ public class Enemy {
         currentFrame = directionFrames[0];
     }
 
-    public void shooting() {
-        // Логика стрельбы
+    public void shooting(Player player) {
+        Sprite bulletSprite = new Sprite(bulletTexture);
+        bulletSprite.setSize(10, 25);
+
+        // Початкова позиція кулі — центр ворога
+        float startX = position.x + width / 2f - bulletSprite.getWidth() / 2f;
+        float startY = position.y + height / 2f - bulletSprite.getHeight() / 2f;
+
+        // Вектор напрямку від ворога до гравця
+        Vector2 direction = new Vector2(
+                player.getPosition().x - position.x,
+                player.getPosition().y - position.y).nor(); // нормалізація
+
+        // Додаємо кулю з цим напрямком
+        bullets.add(new Bullet(bulletSprite, startX, startY, direction, 600f));
     }
 
     public Vector2 getPosition() {
@@ -191,6 +221,10 @@ public class Enemy {
 
     public void setAssignedSlot(int slot) {
         this.assignedSlot = slot;
+    }
+
+    public Array<Bullet> getEnemyBullets() {
+        return bullets;
     }
 
     public int getAssignedSlot() {

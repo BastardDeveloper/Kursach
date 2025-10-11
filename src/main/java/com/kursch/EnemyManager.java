@@ -206,6 +206,28 @@ public class EnemyManager {
                     gameScreen.addScore(e.getPoints());
                     b.destroy();
                 }
+
+            }
+        }
+
+        // --- Столкновения пуль врагов с игроком ---
+        for (Enemy e : enemies) {
+            if (!e.isActive())
+                continue;
+
+            Array<Bullet> enemyBullets = e.getEnemyBullets();
+            for (int i = enemyBullets.size - 1; i >= 0; i--) {
+                Bullet bulletEnemy = enemyBullets.get(i);
+                if (!bulletEnemy.isActive()) {
+                    enemyBullets.removeIndex(i);
+                    continue;
+                }
+
+                // Проверка попадания пули во врага в игрока
+                if (bulletEnemy.getBounds().overlaps(player.getBounds())) {
+                    bulletEnemy.destroy();
+                    player.destroy();
+                }
             }
         }
 
@@ -302,6 +324,7 @@ public class EnemyManager {
             Vector2 start = new Vector2(e.getPosition());
             Vector2 target = new Vector2(player.getPosition());
             e.setMovementPattern(new DiveAttackPattern(start, target, diveDuration / speedMultiplier));
+            e.shooting(player);
         }
     }
 
