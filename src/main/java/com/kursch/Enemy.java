@@ -1,6 +1,7 @@
 package com.kursch;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -38,6 +39,7 @@ public class Enemy {
     private float spawnDelay = 0f;
     private float spawnTimer = 0f;
     private boolean isSpawning = false;
+    Sound enemyDead_Sound = Gdx.audio.newSound(Gdx.files.internal("EnemyDeadSound.mp3"));
 
     public Enemy(TextureRegion[] directionFrames, MovementPattern pattern, float x, float y, int points) {
         this.directionFrames = directionFrames;
@@ -174,6 +176,10 @@ public class Enemy {
     }
 
     public void destroy() {
+        // Відтворення звуку при створенні кулі
+        if (enemyDead_Sound != null) {
+            enemyDead_Sound.play();
+        }
         active = false;
     }
 

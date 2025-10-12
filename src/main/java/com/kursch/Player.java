@@ -65,13 +65,15 @@ public class Player {
     }
 
     private void shoot() {
-        Sound bulletSound = Gdx.audio.newSound(Gdx.files.internal("BulletSound.mp3"));
-        Bullet.loadSound(bulletSound);
         Sprite bulletSprite = new Sprite(bulletTexture);
         bulletSprite.setSize(20, 37);
         float startX = (playerSprite.getX() + (playerSprite.getWidth() - bulletSprite.getWidth()) / 2) - 4;
         float startY = playerSprite.getY() + playerSprite.getHeight();
         Vector2 direction = new Vector2(0, 1); // напрям тільки вгору
+
+        Sound bulletSound = Gdx.audio.newSound(Gdx.files.internal("BulletSound.mp3"));
+        Bullet.loadSound(bulletSound);
+
         bullets.add(new Bullet(bulletSprite, startX, startY, direction, 2000f));
     }
 

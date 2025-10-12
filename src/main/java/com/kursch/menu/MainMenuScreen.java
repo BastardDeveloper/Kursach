@@ -36,8 +36,18 @@ public class MainMenuScreen implements Screen {
         Table table = new Table();
         table.setFillParent(true);
         stage.addActor(table);
-        TextButton playButton = new TextButton("Game", skin);
+        TextButton playButton = new TextButton("play", skin);
         TextButton exitButton = new TextButton("Exit", skin);
+        TextButton settingsButton = new TextButton("Settings", skin);
+        table.add(settingsButton).width(300).height(80).pad(20).row();
+
+        settingsButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.setScreen(new SettingsScreen(game, menuMusic));
+                dispose();
+            }
+        });
 
         playButton.addListener(new ChangeListener() {
             @Override

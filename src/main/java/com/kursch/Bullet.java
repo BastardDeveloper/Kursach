@@ -28,7 +28,7 @@ public class Bullet {
 
         // Відтворення звуку при створенні кулі
         if (shootSound != null) {
-            shootSound.play();
+            shootSound.play(0.2f);
         }
     }
 

@@ -260,7 +260,7 @@ public class EnemyManager {
                 minSpawnCount + random.nextInt(maxSpawnCount - minSpawnCount + 1),
                 freeSlots.size());
 
-        // Определяем стартовую позицию для "сосисочки"
+        // Определяем стартовую позицию для сосисочки
         boolean fromLeft = random.nextBoolean();
         float startX = fromLeft ? -100f : viewport.getWorldWidth() + 100f;
         float startY = viewport.getWorldHeight() + 50f;
