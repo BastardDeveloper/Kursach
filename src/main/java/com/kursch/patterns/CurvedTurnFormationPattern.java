@@ -39,28 +39,27 @@ public class CurvedTurnFormationPattern implements MovementPattern {
     public Vector2 getPosition(float elapsedTime) {
         float t = MathUtils.clamp(elapsedTime / duration, 0f, 1f);
 
-        // 🔹 Фаза 1 (0.0–0.4): Подлёт к игроку с небольшим ускорением
+        // Фаза підльоту + дуга + вихід об'єднані в один параметр t
+        float flightT;
+        Vector2 pos = new Vector2();
+
         if (t < 0.4f) {
-            float phase = easeInOut(t / 0.4f);
-            return new Vector2(start).lerp(approachPoint, phase);
+            // Лінійний підліт до точки approachPoint
+            flightT = t / 0.4f;
+            pos.set(start).lerp(approachPoint, flightT);
+        } else if (t < 0.75f) {
+            // Дуга: рівномірний рух по куту
+            flightT = (t - 0.4f) / 0.35f;
+            float angle = arcStartAngle + (arcEndAngle - arcStartAngle) * flightT; // лінійна інтерполяція кута
+            pos.set(arcCenter.x + MathUtils.cos(angle) * turnRadius,
+                    arcCenter.y + MathUtils.sin(angle) * turnRadius);
+        } else {
+            // Вихід: рівномірний рух від exitPoint до formationTarget
+            flightT = (t - 0.75f) / 0.25f;
+            pos.set(exitPoint).lerp(formationTarget, flightT);
         }
 
-        // 🔹 Фаза 2 (0.4–0.75): Петля вокруг игрока
-        else if (t < 0.75f) {
-            float phase = (t - 0.4f) / 0.35f;
-            float angle = MathUtils.lerp(arcStartAngle, arcEndAngle, easeInOut(phase));
-
-            float x = arcCenter.x + MathUtils.cos(angle) * turnRadius;
-            float y = arcCenter.y + MathUtils.sin(angle) * turnRadius;
-
-            return new Vector2(x, y);
-        }
-
-        // 🔹 Фаза 3 (0.75–1.0): Плавный выход в формацию
-        else {
-            float phase = (t - 0.75f) / 0.25f;
-            return new Vector2(exitPoint).lerp(formationTarget, easeOut(phase));
-        }
+        return pos;
     }
 
     // Точка приближения к игроку (чуть ближе середины)
