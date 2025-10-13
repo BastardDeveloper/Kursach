@@ -13,9 +13,8 @@ public class Bullet {
     private Vector2 position;
     private Vector2 velocity;
     private boolean active = true;
-    private static Sound shootSound; // статичний звук, щоб не завантажувати заново кожного разу
+    private static Sound shootSound;
 
-    // Метод для завантаження звуку перед створенням кулі
     public static void loadSound(Sound sound) {
         shootSound = sound;
     }
@@ -26,7 +25,6 @@ public class Bullet {
         this.velocity = new Vector2(direction).nor().scl(speed);
         this.bulletSprite.setPosition(startX, startY);
 
-        // Відтворення звуку при створенні кулі
         if (shootSound != null) {
             shootSound.play(0.2f);
         }

@@ -12,6 +12,7 @@ import com.kursch.Background;
 import com.kursch.EnemyManager;
 import com.kursch.Main;
 import com.kursch.Player;
+import com.badlogic.gdx.graphics.GL20;
 
 public class GameScreen implements Screen {
     private final Main game;
@@ -109,8 +110,8 @@ public class GameScreen implements Screen {
 
     private void drawPauseOverlay() {
         // Полупрозрачный фон
-        Gdx.gl.glEnable(Gdx.gl.GL_BLEND);
-        Gdx.gl.glBlendFunc(Gdx.gl.GL_SRC_ALPHA, Gdx.gl.GL_ONE_MINUS_SRC_ALPHA);
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         shapeRenderer.setProjectionMatrix(game.viewport.getCamera().combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -118,7 +119,7 @@ public class GameScreen implements Screen {
         shapeRenderer.rect(0, 0, game.viewport.getWorldWidth(), game.viewport.getWorldHeight());
         shapeRenderer.end();
 
-        Gdx.gl.glDisable(Gdx.gl.GL_BLEND);
+        Gdx.gl.glDisable(GL20.GL_BLEND);
 
         // Текст паузы
         game.spriteBatch.begin();

@@ -16,7 +16,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.kursch.Main;
 
 public class GameOverScreen implements Screen {
-    private final Main game;
     private final Stage stage;
     private final Skin skin;
     private final SpriteBatch batch;
@@ -26,14 +25,11 @@ public class GameOverScreen implements Screen {
     private float fadeSpeed = 0.8f;
     private boolean fadingIn = true;
 
-    private final int score;
     private final GameScreen previousScreen;
 
     public GameOverScreen(final Main game, GameScreen previousScreen, int score) {
 
-        this.game = game;
         this.previousScreen = previousScreen;
-        this.score = score;
 
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();

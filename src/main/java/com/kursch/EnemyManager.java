@@ -226,7 +226,7 @@ public class EnemyManager {
                 // Проверка попадания пули во врага в игрока
                 if (bulletEnemy.getBounds().overlaps(player.getBounds())) {
                     bulletEnemy.destroy();
-                    player.destroy();
+                    player.addHit();
                 }
             }
         }
@@ -234,7 +234,7 @@ public class EnemyManager {
         // Столкновение с игроком
         for (Enemy e : enemies) {
             if (e.isActive() && player.getBounds().overlaps(e.getBounds())) {
-                player.destroy();
+                player.addHit();
             }
         }
     }

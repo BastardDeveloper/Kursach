@@ -14,14 +14,11 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.kursch.Main;
 
 public class SettingsScreen implements Screen {
-    private final Main game;
     private final Stage stage;
     private final Skin skin;
-    private final Music menuMusic;
 
     public SettingsScreen(final Main game, final Music menuMusic) {
-        this.game = game;
-        this.menuMusic = menuMusic;
+
         this.stage = new Stage(game.viewport);
         this.skin = new Skin(Gdx.files.internal("uiskin.json"));
         Gdx.input.setInputProcessor(stage);

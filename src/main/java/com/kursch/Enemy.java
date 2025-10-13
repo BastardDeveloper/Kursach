@@ -3,6 +3,7 @@ package com.kursch;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -13,12 +14,16 @@ import com.kursch.patterns.MovementPattern;
 
 public class Enemy {
 
+    private Animation<TextureRegion> deadAnimation;
     private Array<Bullet> bullets;
     private TextureRegion bulletTexture;
     private TextureRegion[] directionFrames;
     private TextureRegion currentFrame;
     private MovementPattern pattern;
     private boolean active = true;
+    private boolean isDead = false;
+    private boolean isReallyDead = false; // Флаг что враг точно мёртв
+    private float stateTime = 0f;
     private boolean inFormation = false;
     private float time;
     private int points;
@@ -41,6 +46,9 @@ public class Enemy {
     private boolean isSpawning = false;
     Sound enemyDead_Sound = Gdx.audio.newSound(Gdx.files.internal("EnemyDeadSound.mp3"));
 
+    // Сохраняем текстуру для правильной очистки
+    private Texture spriteSheet;
+
     public Enemy(TextureRegion[] directionFrames, MovementPattern pattern, float x, float y, int points) {
         this.directionFrames = directionFrames;
         this.pattern = pattern;
@@ -49,23 +57,70 @@ public class Enemy {
         this.prevPosition.set(x, y);
         this.currentFrame = directionFrames[0];
         bullets = new Array<>();
-        bulletTexture = new TextureRegion(new Texture("ВеселаяНарезка.png"), 312, 139, 4, 9);
 
+        // Загружаем текстуру один раз
+        spriteSheet = new Texture("ВеселаяНарезка.png");
+        // ИСПРАВЛЕНИЕ: Отключаем фильтрацию для pixel-perfect рендеринга
+        spriteSheet.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+
+        bulletTexture = new TextureRegion(spriteSheet, 312, 139, 4, 9);
+
+        TextureRegion[] frames = new TextureRegion[5];
+        int startX = 290;
+        int startY = 2;
+        int frameWidth = 30; // ИСПРАВЛЕНИЕ: Уменьшаем на 1 пиксель
+        int frameHeight = 30; // ИСПРАВЛЕНИЕ: Уменьшаем на 1 пиксель
+        int frameCount = 5;
+        int frameOffset = 34; // 31 ширина + 3 промежуток
+
+        // Используем одну текстуру для всех кадров
+        for (int i = 0; i < frameCount; i++) {
+            int SpryteX = startX + i * frameOffset;
+            frames[i] = new TextureRegion(spriteSheet, SpryteX, startY, frameWidth, frameHeight);
+        }
+
+        // Создаём анимацию с длительностью 0.1 секунды на кадр
+        deadAnimation = new Animation<>(0.1f, frames);
     }
 
     public void update(float delta) {
+
+        if (isSpawning) {
+            spawnTimer += delta;
+            if (spawnTimer < spawnDelay) {
+                return; // ждем появления
+            } else {
+                isSpawning = false; // враг активен после задержки
+            }
+        }
+
+        // Если враг мертв — проигрываем анимацию смерти
+        if (isDead) {
+            stateTime += delta;
+            if (deadAnimation.isAnimationFinished(stateTime)) {
+                active = false;
+                isReallyDead = true;
+            }
+            return;
+        }
+
         if (!active)
             return;
 
-        // Обработка задержки спавна
-        if (isSpawning) {
-            spawnTimer += delta;
-            if (spawnTimer >= spawnDelay) {
-                isSpawning = false;
-            } else {
-                return; // Пропускаем обновление пока не истекла задержка
+        // Если проигрывается анимация смерти
+        if (isDead) {
+            stateTime += delta;
+
+            // Проверяем, закончилась ли анимация
+            if (deadAnimation.isAnimationFinished(stateTime)) {
+                active = false;
+                isReallyDead = true; // Враг окончательно мёртв
             }
+            return; // Пока играет анимация — не двигаем врага
         }
+
+        if (!active)
+            return;
 
         time += delta;
         prevPosition.set(position);
@@ -95,17 +150,30 @@ public class Enemy {
         for (Bullet b : bullets) {
             b.update(delta);
         }
-
     }
 
     public void draw(SpriteBatch batch) {
-        if (!active || isSpawning)
-            return;
+        if (isDead) {
+            // Используем false для loop, чтобы анимация не повторялась
+            TextureRegion frame = deadAnimation.getKeyFrame(stateTime, false);
 
-        batch.draw(
-                currentFrame,
-                position.x, position.y,
-                width, height);
+            // ИСПРАВЛЕНИЕ: Увеличиваем размер анимации смерти
+            float deathWidth = width * 1.5f; // Увеличиваем в 1.5 раза
+            float deathHeight = height * 1.5f;
+
+            // Центрируем увеличенную анимацию
+            float offsetX = (width - deathWidth) / 2f;
+            float offsetY = (height - deathHeight) / 2f;
+
+            batch.draw(frame,
+                    position.x + offsetX,
+                    position.y + offsetY,
+                    deathWidth,
+                    deathHeight);
+        } else if (active) {
+            batch.draw(currentFrame, position.x, position.y, width, height);
+        }
+
         for (Bullet b : bullets) {
             b.draw(batch);
         }
@@ -172,15 +240,24 @@ public class Enemy {
     }
 
     public Rectangle getBounds() {
+        // ИСПРАВЛЕНИЕ: Не возвращаем коллизию для мёртвых врагов
+        if (isDead || isReallyDead) {
+            return new Rectangle(0, 0, 0, 0); // Пустой прямоугольник
+        }
         return new Rectangle(position.x, position.y, width, height);
     }
 
     public void destroy() {
-        // Відтворення звуку при створенні кулі
+        // ИСПРАВЛЕНИЕ: Проверяем что враг ещё не начал умирать
+        if (isDead || isReallyDead) {
+            return; // Игнорируем повторные вызовы
+        }
+
         if (enemyDead_Sound != null) {
             enemyDead_Sound.play();
         }
-        active = false;
+        isDead = true;
+        stateTime = 0f; // сбрасываем время, чтобы анимация шла с начала
     }
 
     public boolean isActive() {
@@ -263,9 +340,21 @@ public class Enemy {
         return isSpawning;
     }
 
+    public boolean isDead() {
+        return isDead;
+    }
+
+    public boolean isReallyDead() {
+        return isReallyDead;
+    }
+
     public void dispose() {
-        if (currentFrame != null && currentFrame.getTexture() != null) {
-            currentFrame.getTexture().dispose();
+        // Правильная очистка ресурсов
+        if (spriteSheet != null) {
+            spriteSheet.dispose();
+        }
+        if (enemyDead_Sound != null) {
+            enemyDead_Sound.dispose();
         }
     }
 }

@@ -3,6 +3,7 @@ package com.kursch;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -16,27 +17,66 @@ import com.badlogic.gdx.audio.Sound;
 
 public class Player {
 
+    private Animation<TextureRegion> deadAnimation;
+    private int lives;
     private Array<Bullet> bullets;
     private TextureRegion playerTexture;
     private TextureRegion bulletTexture;
     private GameScreen gameScreen;
     private Sprite playerSprite;
     private FitViewport viewport;
+    private float stateTime = 0f; // счётчик времени для анимации
+    private boolean isDead = false; // пример состояния игрока
+    private float width = 35, height = 35;
 
     public Player(FitViewport viewport, GameScreen gameScreen) {
+
         this.viewport = viewport;
+        this.lives = 3;
         this.gameScreen = gameScreen;
         playerTexture = new TextureRegion(new Texture("SpriteSheet1_Enemies.png"), 100, 78, 250, 250);
         bulletTexture = new TextureRegion(new Texture("ВеселаяНарезка.png"), 312, 139, 4, 9);
+        Texture deathSpriteSheet = new Texture("ВеселаяНарезка.png");
 
         playerSprite = new Sprite(playerTexture);
-        playerSprite.setSize(40, 40);
+        playerSprite.setSize(width, height);
         playerSprite.setPosition(viewport.getWorldWidth() / 2f - 17.5f, 20);
+
+        int startX = 146;
+        int startY = 2;
+        int frameWidth = 30;
+        int frameHeight = 30;
+        int frameCount = 4;
+        int frameOffset = 34;
+
+        // FIX: Array size should match frameCount
+        TextureRegion[] frames = new TextureRegion[frameCount];
+
+        // Нарезаем вручную
+        for (int i = 0; i < frameCount; i++) {
+            int x = startX + i * frameOffset;
+            frames[i] = new TextureRegion(deathSpriteSheet, x, startY, frameWidth, frameHeight);
+        }
+
+        // Создаём анимацию с длительностью 0.2 секунды на кадр
+        deadAnimation = new Animation<>(0.2f, frames);
 
         bullets = new Array<>();
     }
 
     public void update(float delta) {
+        stateTime += delta;
+
+        // Если проигрывается анимация смерти — ничего не делаем
+        if (isDead) {
+            // Проверяем, закончилась ли анимация
+            if (deadAnimation.isAnimationFinished(stateTime)) {
+                isDead = false; // Возвращаемся в нормальное состояние
+                stateTime = 0f; // Сбрасываем таймер
+            }
+            return;
+        }
+
         float speed = 850 * delta;
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
@@ -48,20 +88,15 @@ public class Player {
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
             playerSprite.translateY(-speed);
 
-        // незя в лево право
-        playerSprite.setX(MathUtils.clamp(playerSprite.getX(), 0,
-                viewport.getWorldWidth() - playerSprite.getWidth()));
+        playerSprite.setX(MathUtils.clamp(playerSprite.getX(), 0, viewport.getWorldWidth() - playerSprite.getWidth()));
+        playerSprite
+                .setY(MathUtils.clamp(playerSprite.getY(), 0, viewport.getWorldHeight() - playerSprite.getHeight()));
 
-        // незя верх в низ
-        playerSprite.setY(MathUtils.clamp(playerSprite.getY(), 0,
-                viewport.getWorldHeight() - playerSprite.getHeight()));
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE))
             shoot();
 
-        for (Bullet b : bullets) {
+        for (Bullet b : bullets)
             b.update(delta);
-        }
-
     }
 
     private void shoot() {
@@ -78,14 +113,26 @@ public class Player {
     }
 
     public void draw(SpriteBatch batch) {
-        playerSprite.draw(batch);
-        for (Bullet b : bullets) {
-            b.draw(batch);
+        if (isDead) {
+            TextureRegion frame = deadAnimation.getKeyFrame(stateTime, false);
+            batch.draw(frame, playerSprite.getX(), playerSprite.getY(), playerSprite.getWidth() * 2,
+                    playerSprite.getHeight() * 2);
+        } else {
+            playerSprite.draw(batch);
         }
+
+        for (Bullet b : bullets)
+            b.draw(batch);
     }
 
-    public void destroy() {
-        gameScreen.triggerGameOver();
+    public void addHit() {
+        lives--;
+        isDead = true;
+        stateTime = 0f;
+        if (lives <= 0) {
+            gameScreen.triggerGameOver();
+
+        }
     }
 
     public Rectangle getBounds() {
