@@ -1,4 +1,4 @@
-package com.kursch;
+package com.kursch.enemy;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
@@ -11,6 +11,8 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.kursch.patterns.MovementPattern;
+import com.kursch.Bullet;
+import com.kursch.Player;
 
 public class Enemy {
 
@@ -58,9 +60,7 @@ public class Enemy {
         this.currentFrame = directionFrames[0];
         bullets = new Array<>();
 
-        // Загружаем текстуру один раз
         spriteSheet = new Texture("ВеселаяНарезка.png");
-        // ИСПРАВЛЕНИЕ: Отключаем фильтрацию для pixel-perfect рендеринга
         spriteSheet.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         bulletTexture = new TextureRegion(spriteSheet, 312, 139, 4, 9);
@@ -68,10 +68,10 @@ public class Enemy {
         TextureRegion[] frames = new TextureRegion[5];
         int startX = 290;
         int startY = 2;
-        int frameWidth = 30; // ИСПРАВЛЕНИЕ: Уменьшаем на 1 пиксель
-        int frameHeight = 30; // ИСПРАВЛЕНИЕ: Уменьшаем на 1 пиксель
+        int frameWidth = 30;
+        int frameHeight = 30;
         int frameCount = 5;
-        int frameOffset = 34; // 31 ширина + 3 промежуток
+        int frameOffset = 34;
 
         // Используем одну текстуру для всех кадров
         for (int i = 0; i < frameCount; i++) {
@@ -88,9 +88,9 @@ public class Enemy {
         if (isSpawning) {
             spawnTimer += delta;
             if (spawnTimer < spawnDelay) {
-                return; // ждем появления
+                return;
             } else {
-                isSpawning = false; // враг активен после задержки
+                isSpawning = false;
             }
         }
 

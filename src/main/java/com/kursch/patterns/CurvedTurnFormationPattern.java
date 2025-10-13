@@ -105,18 +105,6 @@ public class CurvedTurnFormationPattern implements MovementPattern {
         return new Vector2(x, y);
     }
 
-    // Ease-in-out для плавности
-    private float easeInOut(float t) {
-        return t < 0.5f
-                ? 2f * t * t
-                : 1f - (1f - 2f * (t - 0.5f)) * (1f - 2f * (t - 0.5f)) / 2f;
-    }
-
-    // Ease-out для финального замедления
-    private float easeOut(float t) {
-        return 1f - (1f - t) * (1f - t);
-    }
-
     @Override
     public boolean isComplete(float time) {
         return time >= duration;

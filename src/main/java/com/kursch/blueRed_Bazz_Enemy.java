@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.kursch.patterns.MovementPattern;
+import com.kursch.enemy.Enemy;
 
 public class blueRed_Bazz_Enemy extends Enemy {
     private static Texture enemyAtlas;

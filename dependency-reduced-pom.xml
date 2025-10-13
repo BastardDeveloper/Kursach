@@ -99,5 +99,6 @@
     <maven.compiler.target>23</maven.compiler.target>
     <libgdx.version>1.13.5</libgdx.version>
     <maven.compiler.source>23</maven.compiler.source>
+    <javacv.version>1.5.10</javacv.version>
   </properties>
 </project>
