@@ -36,7 +36,8 @@ public class EnemyManager {
 
         speedController.update(delta);
 
-        // Обновляем глобальное время для формации
+        // Обновляем глобальное время для всех формационных паттернов
+        com.kursch.patterns.FormationEntryPattern.updateGlobalTime(delta * speedMultiplier);
         com.kursch.patterns.GalagaFormationPattern.updateGlobalTime(delta * speedMultiplier);
 
         spawner.spawnIfNeeded(delta, player, speedMultiplier);
@@ -59,10 +60,8 @@ public class EnemyManager {
 
             e.update(delta * speedMultiplier);
 
-            // Проверяем, завершен ли паттерн ТОЛЬКО если это НЕ DiveAttackPattern
             if (e.isPatternComplete() && e.getAssignedSlot() != -1) {
-                if (!(e.getPattern() instanceof com.kursch.patterns.DiveAttackPattern)
-                        && e.getPattern() instanceof com.kursch.patterns.CurvedTurnFormationPattern) {
+                if (e.getPattern() instanceof com.kursch.patterns.CurvedTurnFormationPattern) {
 
                     int cell = e.getAssignedSlot();
                     float slotX = (viewport.getWorldWidth() / 2f
@@ -72,11 +71,14 @@ public class EnemyManager {
                             + ((cell / spawner.getFormationCols()) - (spawner.getFormationRows() - 1) / 2f)
                                     * spawner.getFormationRowSpacing();
 
-                    // Используем единый паттерн для всей формации
-                    e.setMovementPattern(new com.kursch.patterns.GalagaFormationPattern(
-                            new com.badlogic.gdx.math.Vector2(slotX, slotY),
-                            100f,
-                            0.4f));
+                    // Один паттерн: вход + волна одновременно
+                    e.setMovementPattern(new com.kursch.patterns.FormationEntryPattern(
+                            e.getPosition(), // Текущая позиция врага
+                            slotX, // Целевая X (центр волны)
+                            slotY, // Целевая Y
+                            1.5f, // Длительность входа
+                            0.5f, // Частота волны
+                            100f)); // Амплитуда волны
                 }
             }
         }

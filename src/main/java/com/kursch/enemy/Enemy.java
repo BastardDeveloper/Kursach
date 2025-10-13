@@ -110,9 +110,10 @@ public class Enemy {
         time += delta;
         prevPosition.set(position);
 
-        // Для GalagaFormationPattern используем глобальное время
         Vector2 newPos;
-        if (pattern instanceof com.kursch.patterns.GalagaFormationPattern) {
+        if (pattern instanceof com.kursch.patterns.FormationEntryPattern) {
+            newPos = pattern.getPosition(com.kursch.patterns.FormationEntryPattern.getGlobalGameTime());
+        } else if (pattern instanceof com.kursch.patterns.GalagaFormationPattern) {
             newPos = pattern.getPosition(com.kursch.patterns.GalagaFormationPattern.getGlobalGameTime());
         } else {
             newPos = pattern.getPosition(time);
@@ -176,7 +177,7 @@ public class Enemy {
         }
 
         // Если почти не двигается
-        if (Math.abs(dx) < 0.5f && Math.abs(dy) < 0.5f) {
+        if (Math.abs(dx) < 0.1f && Math.abs(dy) < 0.5f) {
             return directionFrames[0 + animIndex];
         }
 
@@ -248,10 +249,6 @@ public class Enemy {
         stateTime = 0f; // сбрасываем время, чтобы анимация шла с начала
     }
 
-    public boolean isActive() {
-        return active;
-    }
-
     public void setBaseFrame() {
         smoothDirection.set(0, 1);
         animIndex = 0;
@@ -276,21 +273,18 @@ public class Enemy {
         bullets.add(new Bullet(bulletSprite, startX, startY, direction, 600f));
     }
 
-    public Vector2 getPosition() {
-        return new Vector2(position.x, position.y);
-    }
-
     public void setMovementPattern(MovementPattern newPattern) {
         this.pattern = newPattern;
         this.time = 0f;
-
+        setBaseFrame();
         // Если переходим в атаку - враг не в формации
         if (newPattern instanceof com.kursch.patterns.DiveAttackPattern) {
             this.inFormation = false;
         }
-        // Если переходим в GalagaFormationPattern или LeftRightPattern - враг в
-        // формации и атакует
-        else if (newPattern instanceof com.kursch.patterns.GalagaFormationPattern
+        // Если переходим в FormationEntryPattern или GalagaFormationPattern - враг
+        // атакует
+        else if (newPattern instanceof com.kursch.patterns.FormationEntryPattern
+                || newPattern instanceof com.kursch.patterns.GalagaFormationPattern
                 || newPattern instanceof com.kursch.patterns.LeftRightPattern) {
             this.inFormation = true;
         } else {
@@ -298,16 +292,50 @@ public class Enemy {
         }
     }
 
+    public void setSpawnDelay(float delay) {
+        this.spawnDelay = delay;
+        this.spawnTimer = 0f;
+        this.isSpawning = delay > 0;
+    }
+
     public void setPhaseOffset(float phase) {
         this.phaseOffset = phase;
+    }
+
+    public void setAssignedSlot(int slot) {
+        this.assignedSlot = slot;
+    }
+
+    public boolean isPatternComplete() {
+        return pattern != null && pattern.isComplete(time);
+    }
+
+    public boolean isInFormation() {
+        return inFormation;
+    }
+
+    public boolean isSpawning() {
+        return isSpawning;
+    }
+
+    public boolean isDead() {
+        return isDead;
+    }
+
+    public boolean isReallyDead() {
+        return isReallyDead;
+    }
+
+    public boolean isActive() {
+        return active;
     }
 
     public float getPhaseOffset() {
         return phaseOffset;
     }
 
-    public void setAssignedSlot(int slot) {
-        this.assignedSlot = slot;
+    public Vector2 getPosition() {
+        return new Vector2(position.x, position.y);
     }
 
     public Array<Bullet> getEnemyBullets() {
@@ -322,34 +350,8 @@ public class Enemy {
         return points;
     }
 
-    public boolean isPatternComplete() {
-        return pattern != null && pattern.isComplete(time);
-    }
-
     public MovementPattern getPattern() {
         return pattern;
-    }
-
-    public boolean isInFormation() {
-        return inFormation;
-    }
-
-    public void setSpawnDelay(float delay) {
-        this.spawnDelay = delay;
-        this.spawnTimer = 0f;
-        this.isSpawning = delay > 0;
-    }
-
-    public boolean isSpawning() {
-        return isSpawning;
-    }
-
-    public boolean isDead() {
-        return isDead;
-    }
-
-    public boolean isReallyDead() {
-        return isReallyDead;
     }
 
     public void dispose() {
