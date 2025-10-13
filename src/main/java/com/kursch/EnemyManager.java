@@ -34,25 +34,21 @@ public class EnemyManager {
     public void update(float delta, Player player) {
         float speedMultiplier = speedController.getSpeedMultiplier();
 
-        // Оновлюємо прискорення гри
         speedController.update(delta);
 
-        // Спавнимо ворогів
+        // Обновляем глобальное время для формации
+        com.kursch.patterns.GalagaFormationPattern.updateGlobalTime(delta * speedMultiplier);
+
         spawner.spawnIfNeeded(delta, player, speedMultiplier);
 
-        // Оновлюємо всіх ворогів
         updateEnemies(delta, speedMultiplier);
 
-        // Логіка атак ворогів
         attacker.update(delta, player, speedMultiplier);
 
-        // Повернення після атаки
         returnHandler.update(delta, player, speedMultiplier);
 
-        // Колізії
         collisionHandler.update(player);
 
-        // Видаляємо ворогів за межами екрану
         removeOffscreenEnemies();
     }
 
@@ -63,8 +59,11 @@ public class EnemyManager {
 
             e.update(delta * speedMultiplier);
 
+            // Проверяем, завершен ли паттерн ТОЛЬКО если это НЕ DiveAttackPattern
             if (e.isPatternComplete() && e.getAssignedSlot() != -1) {
-                if (e.getPattern() instanceof com.kursch.patterns.CurvedTurnFormationPattern) {
+                if (!(e.getPattern() instanceof com.kursch.patterns.DiveAttackPattern)
+                        && e.getPattern() instanceof com.kursch.patterns.CurvedTurnFormationPattern) {
+
                     int cell = e.getAssignedSlot();
                     float slotX = (viewport.getWorldWidth() / 2f
                             - (spawner.getFormationCols() - 1) * spawner.getFormationSpacing() / 2f)
@@ -72,10 +71,12 @@ public class EnemyManager {
                     float slotY = spawner.getFormationY()
                             + ((cell / spawner.getFormationCols()) - (spawner.getFormationRows() - 1) / 2f)
                                     * spawner.getFormationRowSpacing();
-                    e.setMovementPattern(new com.kursch.patterns.LeftRightPattern(
+
+                    // Используем единый паттерн для всей формации
+                    e.setMovementPattern(new com.kursch.patterns.GalagaFormationPattern(
                             new com.badlogic.gdx.math.Vector2(slotX, slotY),
                             100f,
-                            0.4f * speedMultiplier));
+                            0.4f));
                 }
             }
         }

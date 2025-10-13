@@ -33,6 +33,7 @@ public class Enemy {
     private Vector2 position = new Vector2();
     private Vector2 prevPosition = new Vector2();
     private float width = 40, height = 40;
+    private float phaseOffset = 0f;
 
     private float animationTimer = 0f;
     private int animIndex = 0;
@@ -94,7 +95,6 @@ public class Enemy {
             }
         }
 
-        // Если враг мертв — проигрываем анимацию смерти
         if (isDead) {
             stateTime += delta;
             if (deadAnimation.isAnimationFinished(stateTime)) {
@@ -107,36 +107,25 @@ public class Enemy {
         if (!active)
             return;
 
-        // Если проигрывается анимация смерти
-        if (isDead) {
-            stateTime += delta;
-
-            // Проверяем, закончилась ли анимация
-            if (deadAnimation.isAnimationFinished(stateTime)) {
-                active = false;
-                isReallyDead = true; // Враг окончательно мёртв
-            }
-            return; // Пока играет анимация — не двигаем врага
-        }
-
-        if (!active)
-            return;
-
         time += delta;
         prevPosition.set(position);
-        Vector2 newPos = pattern.getPosition(time);
+
+        // Для GalagaFormationPattern используем глобальное время
+        Vector2 newPos;
+        if (pattern instanceof com.kursch.patterns.GalagaFormationPattern) {
+            newPos = pattern.getPosition(com.kursch.patterns.GalagaFormationPattern.getGlobalGameTime());
+        } else {
+            newPos = pattern.getPosition(time);
+        }
         position.set(newPos);
 
-        // Отмечаем что враг в формации если паттерн завершен
         if (!inFormation && pattern.isComplete(time)) {
             inFormation = true;
         }
 
-        // Вычисляем мгновенное направление движения
         float dx = position.x - prevPosition.x;
         float dy = position.y - prevPosition.y;
 
-        // Сглаживаем направление через lerp
         Vector2 instantDirection = new Vector2(dx, dy);
         if (instantDirection.len2() > 0.01f) {
             instantDirection.nor();
@@ -146,7 +135,6 @@ public class Enemy {
 
         currentFrame = getFrameForDirection(smoothDirection.x, smoothDirection.y);
 
-        // обновляем снаряды врага
         for (Bullet b : bullets) {
             b.update(delta);
         }
@@ -295,11 +283,27 @@ public class Enemy {
     public void setMovementPattern(MovementPattern newPattern) {
         this.pattern = newPattern;
         this.time = 0f;
-        if (newPattern instanceof com.kursch.patterns.LeftRightPattern) {
+
+        // Если переходим в атаку - враг не в формации
+        if (newPattern instanceof com.kursch.patterns.DiveAttackPattern) {
+            this.inFormation = false;
+        }
+        // Если переходим в GalagaFormationPattern или LeftRightPattern - враг в
+        // формации и атакует
+        else if (newPattern instanceof com.kursch.patterns.GalagaFormationPattern
+                || newPattern instanceof com.kursch.patterns.LeftRightPattern) {
             this.inFormation = true;
         } else {
             this.inFormation = false;
         }
+    }
+
+    public void setPhaseOffset(float phase) {
+        this.phaseOffset = phase;
+    }
+
+    public float getPhaseOffset() {
+        return phaseOffset;
     }
 
     public void setAssignedSlot(int slot) {

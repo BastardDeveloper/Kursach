@@ -1,6 +1,7 @@
 // EnemySpawner.java
 package com.kursch.enemy;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -86,6 +87,8 @@ public class EnemySpawner {
             float enemyStartY = startY - i * chainSpacing;
             float spawnDelay = i * 0.15f;
 
+            float phaseShift = (col % 2) * MathUtils.PI; // Альтернирующий сдвиг по колоннам
+
             Enemy newE = new blueRed_Bazz_Enemy(
                     new CurvedTurnFormationPattern(
                             new Vector2(enemyStartX, enemyStartY),
@@ -97,6 +100,7 @@ public class EnemySpawner {
                     enemyStartX, enemyStartY);
             newE.setSpawnDelay(spawnDelay);
             newE.setAssignedSlot(cell);
+            newE.setPhaseOffset(phaseShift); // Устанавливаем фазовый сдвиг
 
             enemies.add(newE);
             reservedMap.put(newE, cell);

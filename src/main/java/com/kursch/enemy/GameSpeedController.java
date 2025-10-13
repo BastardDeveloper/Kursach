@@ -7,7 +7,7 @@ public class GameSpeedController {
 
     private final float baseSpeedMultiplier = 1f;
     private final float maxSpeedMultiplier = 10;
-    private final float speedIncreaseRate = 0.5f; // +50% кожні 10 секунд
+    private final float speedIncreaseRate = 0.1f; // +1% кожні 10 секунд
 
     public void update(float delta) {
         gameTime += delta;
