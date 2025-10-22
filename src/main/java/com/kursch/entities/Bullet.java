@@ -1,4 +1,4 @@
-package com.kursch;
+package com.kursch.entities;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.Sprite;

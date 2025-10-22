@@ -1,12 +1,13 @@
 // EnemySpawner.java
-package com.kursch.enemy;
+package com.kursch.enemyManager;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.kursch.Player;
-import com.kursch.blueRed_Bazz_Enemy;
+import com.kursch.entities.Enemy;
+import com.kursch.entities.Player;
+import com.kursch.entities.enemyCollection.blueRed_Bazz_Enemy;
 import com.kursch.patterns.CurvedTurnFormationPattern;
 
 import java.util.*;

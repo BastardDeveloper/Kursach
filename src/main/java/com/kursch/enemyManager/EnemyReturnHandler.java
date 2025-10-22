@@ -1,12 +1,13 @@
-package com.kursch.enemy;
+package com.kursch.enemyManager;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.kursch.Player;
+import com.kursch.entities.Enemy;
+import com.kursch.entities.Player;
 import com.kursch.patterns.CurvedTurnFormationPattern;
 import com.kursch.patterns.DiveAttackPattern;
-import com.kursch.patterns.MovementPattern;
+import com.kursch.patterns.IMovementPattern;
 
 import java.util.*;
 
@@ -33,7 +34,7 @@ public class EnemyReturnHandler {
             if (!e.isActive())
                 continue;
 
-            MovementPattern pattern = e.getPattern();
+            IMovementPattern pattern = e.getPattern();
 
             if (pattern instanceof DiveAttackPattern && !pendingReturnTimers.containsKey(e)) {
                 pendingReturnTimers.put(e, 0.6f / speedMultiplier);

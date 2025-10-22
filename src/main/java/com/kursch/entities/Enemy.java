@@ -1,4 +1,4 @@
-package com.kursch.enemy;
+package com.kursch.entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
@@ -10,9 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.kursch.patterns.MovementPattern;
-import com.kursch.Bullet;
-import com.kursch.Player;
+import com.kursch.patterns.IMovementPattern;
 
 public class Enemy {
 
@@ -21,7 +19,7 @@ public class Enemy {
     private TextureRegion bulletTexture;
     private TextureRegion[] directionFrames;
     private TextureRegion currentFrame;
-    private MovementPattern pattern;
+    private IMovementPattern pattern;
     private boolean active = true;
     private boolean isDead = false;
     private boolean isReallyDead = false; // Флаг что враг точно мёртв
@@ -52,7 +50,7 @@ public class Enemy {
     // Сохраняем текстуру для правильной очистки
     private Texture spriteSheet;
 
-    public Enemy(TextureRegion[] directionFrames, MovementPattern pattern, float x, float y, int points) {
+    public Enemy(TextureRegion[] directionFrames, IMovementPattern pattern, float x, float y, int points) {
         this.directionFrames = directionFrames;
         this.pattern = pattern;
         this.points = points;
@@ -273,7 +271,7 @@ public class Enemy {
         bullets.add(new Bullet(bulletSprite, startX, startY, direction, 600f));
     }
 
-    public void setMovementPattern(MovementPattern newPattern) {
+    public void setMovementPattern(IMovementPattern newPattern) {
         this.pattern = newPattern;
         this.time = 0f;
         setBaseFrame();
@@ -350,7 +348,7 @@ public class Enemy {
         return points;
     }
 
-    public MovementPattern getPattern() {
+    public IMovementPattern getPattern() {
         return pattern;
     }
 

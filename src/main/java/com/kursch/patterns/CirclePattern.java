@@ -3,7 +3,7 @@ package com.kursch.patterns;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
-public class CirclePattern implements MovementPattern {
+public class CirclePattern implements IMovementPattern {
 
     private final Vector2 center; // Центр вращения
     private final float radius; // Радиус круга

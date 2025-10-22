@@ -3,7 +3,7 @@ package com.kursch.patterns;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
-public class DiveAttackPattern implements MovementPattern {
+public class DiveAttackPattern implements IMovementPattern {
 
     private final Vector2 start;
     private final Vector2 target;

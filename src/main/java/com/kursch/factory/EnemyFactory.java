@@ -1,13 +1,16 @@
 // EnemyManager.java
-package com.kursch;
+package com.kursch.factory;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.kursch.enemy.*;
+import com.kursch.enemyManager.*;
+import com.kursch.entities.Enemy;
+import com.kursch.entities.Player;
+import com.kursch.entities.enemyCollection.blueRed_Bazz_Enemy;
 import com.kursch.menu.GameScreen;
 
-public class EnemyManager {
+public class EnemyFactory {
 
     private final FitViewport viewport;
     private final Array<Enemy> enemies;
@@ -19,7 +22,7 @@ public class EnemyManager {
     private final EnemyReturnHandler returnHandler;
     private final EnemyCollisionHandler collisionHandler;
 
-    public EnemyManager(FitViewport viewport, GameScreen gameScreen) {
+    public EnemyFactory(FitViewport viewport, GameScreen gameScreen) {
         this.viewport = viewport;
         this.gameScreen = gameScreen;
         this.enemies = new Array<>();
@@ -115,7 +118,7 @@ public class EnemyManager {
     public void dispose() {
         for (Enemy e : enemies)
             e.dispose();
-        com.kursch.blueRed_Bazz_Enemy.disposeStatic();
+        com.kursch.entities.enemyCollection.blueRed_Bazz_Enemy.disposeStatic();
     }
 
     public Array<Enemy> getEnemies() {

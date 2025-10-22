@@ -3,7 +3,7 @@ package com.kursch.patterns;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.MathUtils;
 
-public class CurvedTurnFormationPattern implements MovementPattern {
+public class CurvedTurnFormationPattern implements IMovementPattern {
     private final Vector2 start;
     private final Vector2 playerTarget;
     private final Vector2 formationTarget;

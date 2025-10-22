@@ -1,4 +1,4 @@
-package com.kursch.enemy;
+package com.kursch.enemyManager;
 
 public class GameSpeedController {
 

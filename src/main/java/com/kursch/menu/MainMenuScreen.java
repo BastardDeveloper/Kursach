@@ -9,8 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.kursch.Background;
 import com.kursch.Main;
+import com.kursch.graphics.Background;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public class MainMenuScreen implements Screen {
@@ -72,7 +72,7 @@ public class MainMenuScreen implements Screen {
     @Override
     public void render(float delta) {
         batch.begin();
-        background.update(delta, 400);
+        background.update(delta, 200);
         background.draw(batch);
         batch.end();
         stage.act(delta);

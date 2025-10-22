@@ -1,8 +1,9 @@
-package com.kursch.enemy;
+package com.kursch.enemyManager;
 
 import com.badlogic.gdx.utils.Array;
-import com.kursch.Player;
-import com.kursch.Bullet;
+import com.kursch.entities.Bullet;
+import com.kursch.entities.Enemy;
+import com.kursch.entities.Player;
 import com.kursch.menu.GameScreen;
 
 public class EnemyCollisionHandler {

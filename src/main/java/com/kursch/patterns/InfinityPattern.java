@@ -3,7 +3,7 @@ package com.kursch.patterns;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
-public class InfinityPattern implements MovementPattern {
+public class InfinityPattern implements IMovementPattern {
 
     private final Vector2 center; // Центр "восьмёрки"
     private final float size; // Размер/амплитуда траектории

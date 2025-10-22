@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 /**
  * Единый паттерн: плавный вход в формацию + волновое движение одновременно
  */
-public class FormationEntryPattern implements MovementPattern {
+public class FormationEntryPattern implements IMovementPattern {
     private final Vector2 startPos;
     private final Vector2 formationCenterX; // Только X позиция в центре волны
     private final float formationY; // Y позиция в строю

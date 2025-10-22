@@ -3,7 +3,7 @@ package com.kursch.patterns;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
-public class ZigzagPattern implements MovementPattern {
+public class ZigzagPattern implements IMovementPattern {
 
     private final Vector2 start; // Стартовая позиция
     private final float speed; // Скорость движения вниз

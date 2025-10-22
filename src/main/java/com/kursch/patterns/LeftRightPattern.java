@@ -3,7 +3,7 @@ package com.kursch.patterns;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
-public class LeftRightPattern implements MovementPattern {
+public class LeftRightPattern implements IMovementPattern {
     private final Vector2 center;
     private final float amplitude;
     private final float frequency;

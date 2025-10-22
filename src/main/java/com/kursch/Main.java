@@ -6,6 +6,9 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kursch.menu.MainMenuScreen;
+import com.kursch.entities.Player;
+import com.kursch.factory.EnemyFactory;
+import com.kursch.graphics.Background;
 import com.kursch.menu.GameScreen;
 
 public class Main extends Game {
@@ -14,7 +17,7 @@ public class Main extends Game {
 
     public Player player;
     public Background background;
-    public EnemyManager enemyManager;
+    public EnemyFactory enemyManager;
     public GameScreen gameScreen;
     Array<Sprite> enemySprites;
 
@@ -27,7 +30,7 @@ public class Main extends Game {
         background = new Background(viewport);
         gameScreen = new GameScreen(this);
         player = new Player(viewport, gameScreen);
-        enemyManager = new EnemyManager(viewport, gameScreen);
+        enemyManager = new EnemyFactory(viewport, gameScreen);
 
     }
 

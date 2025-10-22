@@ -8,10 +8,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.kursch.Background;
-import com.kursch.EnemyManager;
 import com.kursch.Main;
-import com.kursch.Player;
+import com.kursch.entities.Player;
+import com.kursch.factory.EnemyFactory;
+import com.kursch.graphics.Background;
 import com.badlogic.gdx.graphics.GL20;
 
 public class GameScreen implements Screen {
@@ -44,7 +44,7 @@ public class GameScreen implements Screen {
         gameMusic.setVolume(0f);
 
         game.player = new Player(game.viewport, this);
-        game.enemyManager = new EnemyManager(game.viewport, this);
+        game.enemyManager = new EnemyFactory(game.viewport, this);
         game.background = new Background(game.viewport);
 
         score = 0;

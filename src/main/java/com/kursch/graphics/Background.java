@@ -1,4 +1,4 @@
-package com.kursch;
+package com.kursch.graphics;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;

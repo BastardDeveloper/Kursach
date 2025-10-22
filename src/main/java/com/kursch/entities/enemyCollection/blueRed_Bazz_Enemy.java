@@ -1,11 +1,11 @@
-package com.kursch;
+package com.kursch.entities.enemyCollection;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.kursch.patterns.MovementPattern;
-import com.kursch.enemy.Enemy;
+import com.kursch.entities.Enemy;
+import com.kursch.patterns.IMovementPattern;
 
 public class blueRed_Bazz_Enemy extends Enemy {
     private static Texture enemyAtlas;
@@ -118,7 +118,7 @@ public class blueRed_Bazz_Enemy extends Enemy {
             enemy_FullRightBottom, enemy_FullRightBottom_2 // 26-27: полностью вправо (низ)
     };
 
-    public blueRed_Bazz_Enemy(MovementPattern pattern, float x, float y) {
+    public blueRed_Bazz_Enemy(IMovementPattern pattern, float x, float y) {
         super(directionFrames, pattern, x, y, 100);
     }
 
