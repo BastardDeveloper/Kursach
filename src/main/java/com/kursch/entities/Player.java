@@ -1,5 +1,11 @@
 package com.kursch.entities;
 
+/* Таски
+ * 1. Унести логику создание пуль и звука в другие класы.
+ * 2. Унести логику анимации смерти в друой класс
+ * 3. Почистить методы которые в родительском класе
+ */
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
@@ -14,7 +20,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kursch.menu.GameScreen;
 import com.badlogic.gdx.audio.Sound;
 
-public class Player extends GameObject {
+public class Player extends AGameObject {
 
     private Animation<TextureRegion> deadAnimation;
     private int lives;
@@ -135,6 +141,7 @@ public class Player extends GameObject {
         return bullets;
     }
 
+    @Override
     public void dispose() {
         bulletTexture.getTexture().dispose();
     }

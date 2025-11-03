@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
-public abstract class GameObject {
+public abstract class AGameObject {
     protected Sprite sprite;
     protected boolean alive = true;
 
@@ -13,7 +13,7 @@ public abstract class GameObject {
 
     public abstract void draw(SpriteBatch batch);
 
-    // Используем реальный размер спрайта
+    // создаем хит бокс
     public Rectangle getBounds() {
         if (sprite != null) {
             return new Rectangle(sprite.getX(), sprite.getY(),
@@ -22,6 +22,7 @@ public abstract class GameObject {
         return new Rectangle(0, 0, 0, 0);
     }
 
+    // передать позицию
     public Vector2 getPosition() {
         if (sprite != null) {
             return new Vector2(sprite.getX(), sprite.getY());
@@ -29,6 +30,7 @@ public abstract class GameObject {
         return new Vector2(0, 0);
     }
 
+    // задать позицию
     public void setPosition(float x, float y) {
         if (sprite != null) {
             sprite.setPosition(x, y);
