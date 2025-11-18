@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.kursch.entities.Enemy;
 import com.kursch.patterns.IMovementPattern;
+import com.kursch.graphics.animation.AnimationManager;
 
 public class blueRed_Bazz_Enemy extends Enemy {
     private static Texture enemyAtlas;
@@ -16,7 +17,6 @@ public class blueRed_Bazz_Enemy extends Enemy {
         pixmap.dispose();
         enemyAtlas.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         enemyAtlas.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
-
     }
 
     // --- UP ---
@@ -118,8 +118,8 @@ public class blueRed_Bazz_Enemy extends Enemy {
             enemy_FullRightBottom, enemy_FullRightBottom_2 // 26-27: полностью вправо (низ)
     };
 
-    public blueRed_Bazz_Enemy(IMovementPattern pattern, float x, float y) {
-        super(directionFrames, pattern, x, y, 100);
+    public blueRed_Bazz_Enemy(IMovementPattern pattern, float x, float y, AnimationManager animationManager) {
+        super(directionFrames, pattern, x, y, 100, animationManager);
     }
 
     public static void disposeStatic() {

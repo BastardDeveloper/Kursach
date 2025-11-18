@@ -6,20 +6,22 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ObjectMap;
 
 public class AnimationManager {
-
     private Texture spriteSheet;
     private ObjectMap<String, Animation<TextureRegion>> animations;
 
     public AnimationManager() {
         spriteSheet = new Texture("ВеселаяНарезка.png");
+        spriteSheet.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         animations = new ObjectMap<>();
         loadAnimations();
     }
 
     private void loadAnimations() {
-
+        // Анимация смерти игрока
         animations.put("player_death", createAnimation(146, 2, 30, 30, 4, 34, 0.2f));
 
+        // Анимация смерти врага
+        animations.put("enemy_death", createAnimation(290, 2, 30, 30, 5, 34, 0.1f));
     }
 
     private Animation<TextureRegion> createAnimation(int startX, int startY, int frameWidth, int frameHeight,
@@ -34,6 +36,10 @@ public class AnimationManager {
 
     public Animation<TextureRegion> get(String name) {
         return animations.get(name);
+    }
+
+    public Texture getSpriteSheet() {
+        return spriteSheet;
     }
 
     public void dispose() {

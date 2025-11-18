@@ -13,6 +13,7 @@ public class Bullet {
     private Vector2 position;
     private Vector2 velocity;
     private boolean active = true;
+
     private static Sound shootSound;
 
     public static void loadSound(Sound sound) {
@@ -23,6 +24,7 @@ public class Bullet {
         this.bulletSprite = bulletSprite;
         this.position = new Vector2(startX, startY);
         this.velocity = new Vector2(direction).nor().scl(speed);
+
         this.bulletSprite.setPosition(startX, startY);
 
         if (shootSound != null) {
@@ -36,17 +38,22 @@ public class Bullet {
 
         position.x += velocity.x * delta;
         position.y += velocity.y * delta;
+
         bulletSprite.setPosition(position.x, position.y);
 
-        if (position.y < -50 || position.y > Gdx.graphics.getHeight() * 2 ||
-                position.x < -50 || position.x > Gdx.graphics.getWidth() * 2) {
+        if (position.y < -50 ||
+                position.y > Gdx.graphics.getHeight() * 2 ||
+                position.x < -50 ||
+                position.x > Gdx.graphics.getWidth() * 2) {
+
             active = false;
         }
     }
 
     public void draw(SpriteBatch batch) {
-        if (active)
+        if (active) {
             bulletSprite.draw(batch);
+        }
     }
 
     public boolean isActive() {
@@ -58,7 +65,8 @@ public class Bullet {
     }
 
     public Rectangle getBounds() {
-        return new Rectangle(position.x, position.y, bulletSprite.getWidth(), bulletSprite.getHeight());
+        return new Rectangle(position.x, position.y,
+                bulletSprite.getWidth(), bulletSprite.getHeight());
     }
 
     public Vector2 getPosition() {

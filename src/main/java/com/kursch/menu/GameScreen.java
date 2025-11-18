@@ -47,7 +47,7 @@ public class GameScreen implements Screen {
 
         animationManager = new AnimationManager();
         game.player = new Player(game.viewport, this, animationManager);
-        game.enemyManager = new EnemyFactory(game.viewport, this);
+        game.enemyManager = new EnemyFactory(game.viewport, this, animationManager);
         game.background = new Background(game.viewport);
 
         score = 0;

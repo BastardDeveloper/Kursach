@@ -1,4 +1,3 @@
-// EnemySpawner.java
 package com.kursch.enemyManager;
 
 import com.badlogic.gdx.math.MathUtils;
@@ -9,6 +8,7 @@ import com.kursch.entities.Enemy;
 import com.kursch.entities.Player;
 import com.kursch.entities.enemyCollection.blueRed_Bazz_Enemy;
 import com.kursch.patterns.CurvedTurnFormationPattern;
+import com.kursch.graphics.animation.AnimationManager;
 
 import java.util.*;
 
@@ -17,6 +17,7 @@ public class EnemySpawner {
     private final FitViewport viewport;
     private final Array<Enemy> enemies;
     private final Random random = new Random();
+    private final AnimationManager animationManager;
 
     private final boolean[] slotReserved;
     private final Map<Enemy, Integer> reservedMap;
@@ -36,9 +37,10 @@ public class EnemySpawner {
     private final int baseMaxSpawn = 6;
     private final float entryDuration = 5f;
 
-    public EnemySpawner(FitViewport viewport, Array<Enemy> enemies) {
+    public EnemySpawner(FitViewport viewport, Array<Enemy> enemies, AnimationManager animationManager) {
         this.viewport = viewport;
         this.enemies = enemies;
+        this.animationManager = animationManager;
         this.slotReserved = new boolean[formationCols * formationRows];
         this.reservedMap = new HashMap<>();
     }
@@ -98,7 +100,7 @@ public class EnemySpawner {
                             (entryDuration + spawnDelay) / speedMultiplier,
                             150f,
                             direction),
-                    enemyStartX, enemyStartY);
+                    enemyStartX, enemyStartY, animationManager);
             newE.setSpawnDelay(spawnDelay);
             newE.setAssignedSlot(cell);
             newE.setPhaseOffset(phaseShift); // Устанавливаем фазовый сдвиг

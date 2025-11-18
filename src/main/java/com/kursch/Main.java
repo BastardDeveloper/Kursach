@@ -34,7 +34,7 @@ public class Main extends Game {
         gameScreen = new GameScreen(this);
         animationManager = new AnimationManager();
         player = new Player(viewport, gameScreen, animationManager);
-        enemyManager = new EnemyFactory(viewport, gameScreen);
+        enemyManager = new EnemyFactory(viewport, gameScreen, animationManager);
 
     }
 

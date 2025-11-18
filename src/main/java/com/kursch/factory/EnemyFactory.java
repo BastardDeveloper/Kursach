@@ -8,6 +8,7 @@ import com.kursch.enemyManager.*;
 import com.kursch.entities.Enemy;
 import com.kursch.entities.Player;
 import com.kursch.entities.enemyCollection.blueRed_Bazz_Enemy;
+import com.kursch.graphics.animation.AnimationManager;
 import com.kursch.menu.GameScreen;
 
 public class EnemyFactory {
@@ -15,6 +16,7 @@ public class EnemyFactory {
     private final FitViewport viewport;
     private final Array<Enemy> enemies;
     private final GameScreen gameScreen;
+    private final AnimationManager animationManager;
 
     private final GameSpeedController speedController;
     private final EnemySpawner spawner;
@@ -22,13 +24,13 @@ public class EnemyFactory {
     private final EnemyReturnHandler returnHandler;
     private final EnemyCollisionHandler collisionHandler;
 
-    public EnemyFactory(FitViewport viewport, GameScreen gameScreen) {
+    public EnemyFactory(FitViewport viewport, GameScreen gameScreen, AnimationManager animationManager) {
         this.viewport = viewport;
         this.gameScreen = gameScreen;
         this.enemies = new Array<>();
-
+        this.animationManager = animationManager;
         this.speedController = new GameSpeedController();
-        this.spawner = new EnemySpawner(viewport, enemies);
+        this.spawner = new EnemySpawner(viewport, enemies, animationManager);
         this.attacker = new EnemyAttacker(enemies);
         this.returnHandler = new EnemyReturnHandler(enemies, viewport);
         this.collisionHandler = new EnemyCollisionHandler(enemies, gameScreen);

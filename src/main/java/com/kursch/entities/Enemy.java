@@ -2,7 +2,6 @@ package com.kursch.entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -11,12 +10,13 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.kursch.patterns.IMovementPattern;
+import com.kursch.graphics.animation.AnimationManager;
 
 public class Enemy extends AGameObject {
 
     private Animation<TextureRegion> deadAnimation;
     private Array<Bullet> bullets;
-    private TextureRegion bulletTexture;
+    private BulletFactory bulletFactory;
     private TextureRegion[] directionFrames;
     private TextureRegion currentFrame;
     private IMovementPattern pattern;
@@ -44,9 +44,8 @@ public class Enemy extends AGameObject {
     private boolean isSpawning = false;
     private Sound enemyDead_Sound;
 
-    private Texture spriteSheet;
-
-    public Enemy(TextureRegion[] directionFrames, IMovementPattern pattern, float x, float y, int points) {
+    public Enemy(TextureRegion[] directionFrames, IMovementPattern pattern, float x, float y,
+            int points, AnimationManager animationManager) {
         this.directionFrames = directionFrames;
         this.pattern = pattern;
         this.points = points;
@@ -61,28 +60,14 @@ public class Enemy extends AGameObject {
         sprite.setSize(width, height);
         sprite.setPosition(x, y);
 
-        // Загрузка ресурсов
+        // Загрузка звука
         enemyDead_Sound = Gdx.audio.newSound(Gdx.files.internal("EnemyDeadSound.mp3"));
-        spriteSheet = new Texture("ВеселаяНарезка.png");
-        spriteSheet.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
-        bulletTexture = new TextureRegion(spriteSheet, 312, 139, 4, 9);
+        // Получение анимации смерти из AnimationManager
+        deadAnimation = animationManager.get("enemy_death");
 
-        // Инициализация анимации смерти
-        TextureRegion[] frames = new TextureRegion[5];
-        int startX = 290;
-        int startY = 2;
-        int frameWidth = 30;
-        int frameHeight = 30;
-        int frameCount = 5;
-        int frameOffset = 34;
-
-        for (int i = 0; i < frameCount; i++) {
-            int SpryteX = startX + i * frameOffset;
-            frames[i] = new TextureRegion(spriteSheet, SpryteX, startY, frameWidth, frameHeight);
-        }
-
-        deadAnimation = new Animation<>(0.1f, frames);
+        // Инициализация фабрики пуль
+        bulletFactory = new BulletFactory(animationManager.getSpriteSheet());
     }
 
     @Override
@@ -274,17 +259,14 @@ public class Enemy extends AGameObject {
     }
 
     public void shooting(Player player) {
-        Sprite bulletSprite = new Sprite(bulletTexture);
-        bulletSprite.setSize(10, 25);
-
-        float startX = position.x + width / 2f - bulletSprite.getWidth() / 2f;
-        float startY = position.y + height / 2f - bulletSprite.getHeight() / 2f;
-
-        Vector2 direction = new Vector2(
-                player.getPosition().x - position.x,
-                player.getPosition().y - position.y).nor();
-
-        bullets.add(new Bullet(bulletSprite, startX, startY, direction, 600f));
+        // Используем BulletFactory для создания пули
+        Bullet bullet = bulletFactory.createEnemyBullet(
+                position,
+                width,
+                height,
+                player.getPosition(),
+                600f);
+        bullets.add(bullet);
     }
 
     public void setMovementPattern(IMovementPattern newPattern) {
@@ -360,9 +342,6 @@ public class Enemy extends AGameObject {
 
     @Override
     public void dispose() {
-        if (spriteSheet != null) {
-            spriteSheet.dispose();
-        }
         if (enemyDead_Sound != null) {
             enemyDead_Sound.dispose();
         }
