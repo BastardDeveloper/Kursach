@@ -30,7 +30,7 @@ public class EnemyCollisionHandler {
                 continue;
             }
             for (Enemy e : enemies) {
-                if (e.isActive() && b.getBounds().overlaps(e.getBounds())) {
+                if (e.isAlive() && b.getBounds().overlaps(e.getBounds())) {
                     e.destroy();
                     gameScreen.addScore(e.getPoints());
                     b.destroy();
@@ -41,7 +41,7 @@ public class EnemyCollisionHandler {
 
     private void handleEnemyBullets(Player player) {
         for (Enemy e : enemies) {
-            if (!e.isActive())
+            if (!e.isAlive())
                 continue;
 
             Array<Bullet> enemyBullets = e.getEnemyBullets();
@@ -62,7 +62,7 @@ public class EnemyCollisionHandler {
 
     private void handlePlayerCollision(Player player) {
         for (Enemy e : enemies) {
-            if (e.isActive() && player.getBounds().overlaps(e.getBounds())) {
+            if (e.isAlive() && player.getBounds().overlaps(e.getBounds())) {
                 player.addHit();
             }
         }

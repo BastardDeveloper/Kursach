@@ -19,58 +19,38 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kursch.menu.GameScreen;
 import com.badlogic.gdx.audio.Sound;
+import com.kursch.graphics.animation.AnimationManager;
 
 public class Player extends AGameObject {
 
-    private Animation<TextureRegion> deadAnimation;
+    private Animation<TextureRegion> deathAnimation;
     private int lives;
     private Array<Bullet> bullets;
     private TextureRegion bulletTexture;
     private GameScreen gameScreen;
     private FitViewport viewport;
-    private float stateTime = 0f; // счётчик времени для анимации
     private boolean isPlayingDeathAnimation = false; // Временное состояние
+    private float stateTime = 0f;
 
-    public Player(FitViewport viewport, GameScreen gameScreen) {
-
+    public Player(FitViewport viewport, GameScreen gameScreen, AnimationManager animationManager) {
         this.viewport = viewport;
         this.lives = 3;
         this.gameScreen = gameScreen;
+        this.deathAnimation = animationManager.get("player_death");
 
-        sprite = new Sprite((new TextureRegion(new Texture("SpriteSheet1_Enemies.png"), 100, 78, 250, 250)));
+        sprite = new Sprite(new TextureRegion(new Texture("SpriteSheet1_Enemies.png"), 100, 78, 250, 250));
         bulletTexture = new TextureRegion(new Texture("ВеселаяНарезка.png"), 312, 139, 4, 9);
-        Texture deathSpriteSheet = new Texture("ВеселаяНарезка.png");
-
         sprite.setPosition(viewport.getWorldWidth() / 2f - 17.5f, 20);
         sprite.setSize(35, 35);
-
-        int startX = 146;
-        int startY = 2;
-        int frameWidth = 30;
-        int frameHeight = 30;
-        int frameCount = 4;
-        int frameOffset = 34;
-
-        TextureRegion[] frames = new TextureRegion[frameCount];
-
-        // Нарезаем вручную
-        for (int i = 0; i < frameCount; i++) {
-            int x = startX + i * frameOffset;
-            frames[i] = new TextureRegion(deathSpriteSheet, x, startY, frameWidth, frameHeight);
-        }
-
-        // Создаём анимацию с длительностью 0.2 секунды на кадр
-        deadAnimation = new Animation<>(0.2f, frames);
-
         bullets = new Array<>();
     }
 
     @Override
     public void update(float delta) {
-        stateTime += delta;
 
+        stateTime += delta;
         if (isPlayingDeathAnimation) {
-            if (deadAnimation.isAnimationFinished(stateTime)) {
+            if (deathAnimation.isAnimationFinished(stateTime)) {
                 isPlayingDeathAnimation = false;
                 stateTime = 0f;
             }
@@ -115,7 +95,7 @@ public class Player extends AGameObject {
     @Override
     public void draw(SpriteBatch batch) {
         if (isPlayingDeathAnimation) {
-            TextureRegion frame = deadAnimation.getKeyFrame(stateTime, false);
+            TextureRegion frame = deathAnimation.getKeyFrame(stateTime, false);
             batch.draw(frame, sprite.getX() - 20, sprite.getY() - 2, sprite.getWidth() * 2,
                     sprite.getHeight() * 2);
         } else {

@@ -58,7 +58,7 @@ public class EnemyFactory {
 
     private void updateEnemies(float delta, float speedMultiplier) {
         for (Enemy e : enemies) {
-            if (!e.isActive())
+            if (!e.isAlive())
                 continue;
 
             e.update(delta * speedMultiplier);
@@ -95,7 +95,7 @@ public class EnemyFactory {
         for (int i = enemies.size - 1; i >= 0; i--) {
             Enemy e = enemies.get(i);
 
-            if (!e.isActive()) {
+            if (!e.isAlive()) {
                 spawner.freeSlot(e.getAssignedSlot());
                 enemies.removeIndex(i);
                 continue;

@@ -12,6 +12,7 @@ import com.kursch.Main;
 import com.kursch.entities.Player;
 import com.kursch.factory.EnemyFactory;
 import com.kursch.graphics.Background;
+import com.kursch.graphics.animation.AnimationManager;
 import com.badlogic.gdx.graphics.GL20;
 
 public class GameScreen implements Screen {
@@ -26,6 +27,7 @@ public class GameScreen implements Screen {
     private final float FADE_DURATION = 3f;
     private final float TARGET_VOLUME = 0.5f;
     private ShapeRenderer shapeRenderer;
+    public AnimationManager animationManager;
 
     public GameScreen(Main game) {
         this.game = game;
@@ -43,7 +45,8 @@ public class GameScreen implements Screen {
         gameMusic.setLooping(true);
         gameMusic.setVolume(0f);
 
-        game.player = new Player(game.viewport, this);
+        animationManager = new AnimationManager();
+        game.player = new Player(game.viewport, this, animationManager);
         game.enemyManager = new EnemyFactory(game.viewport, this);
         game.background = new Background(game.viewport);
 

@@ -31,7 +31,7 @@ public class EnemyReturnHandler {
 
     public void update(float delta, Player player, float speedMultiplier) {
         for (Enemy e : enemies) {
-            if (!e.isActive())
+            if (!e.isAlive())
                 continue;
 
             IMovementPattern pattern = e.getPattern();
@@ -47,7 +47,7 @@ public class EnemyReturnHandler {
             Enemy e = entry.getKey();
             float t = entry.getValue() - delta;
 
-            if (t <= 0f && e.isActive() && e.getAssignedSlot() != -1) {
+            if (t <= 0f && e.isAlive() && e.getAssignedSlot() != -1) {
                 int cell = e.getAssignedSlot();
                 float slotX = (viewport.getWorldWidth() / 2f - (formationCols - 1) * formationSpacing / 2f)
                         + (cell % formationCols) * formationSpacing;

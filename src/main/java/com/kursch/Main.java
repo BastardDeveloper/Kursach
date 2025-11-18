@@ -1,5 +1,6 @@
 package com.kursch;
 
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.Game;
@@ -9,6 +10,7 @@ import com.kursch.menu.MainMenuScreen;
 import com.kursch.entities.Player;
 import com.kursch.factory.EnemyFactory;
 import com.kursch.graphics.Background;
+import com.kursch.graphics.animation.AnimationManager;
 import com.kursch.menu.GameScreen;
 
 public class Main extends Game {
@@ -19,6 +21,7 @@ public class Main extends Game {
     public Background background;
     public EnemyFactory enemyManager;
     public GameScreen gameScreen;
+    public AnimationManager animationManager;
     Array<Sprite> enemySprites;
 
     @Override
@@ -29,7 +32,8 @@ public class Main extends Game {
         setScreen(new MainMenuScreen(this));
         background = new Background(viewport);
         gameScreen = new GameScreen(this);
-        player = new Player(viewport, gameScreen);
+        animationManager = new AnimationManager();
+        player = new Player(viewport, gameScreen, animationManager);
         enemyManager = new EnemyFactory(viewport, gameScreen);
 
     }

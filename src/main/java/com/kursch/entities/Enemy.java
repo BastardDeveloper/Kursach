@@ -12,7 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.kursch.patterns.IMovementPattern;
 
-public class Enemy {
+public class Enemy extends AGameObject {
 
     private Animation<TextureRegion> deadAnimation;
     private Array<Bullet> bullets;
@@ -20,9 +20,8 @@ public class Enemy {
     private TextureRegion[] directionFrames;
     private TextureRegion currentFrame;
     private IMovementPattern pattern;
-    private boolean active = true;
     private boolean isDead = false;
-    private boolean isReallyDead = false; // Флаг что враг точно мёртв
+    private boolean isReallyDead = false;
     private float stateTime = 0f;
     private boolean inFormation = false;
     private float time;
@@ -37,17 +36,14 @@ public class Enemy {
     private int animIndex = 0;
     private final float animationSpeed = 0.5f;
 
-    // Сглаженное направление
     private Vector2 smoothDirection = new Vector2(0, 1);
     private final float directionSmoothness = 0.15f;
 
-    // Задержка спавна
     private float spawnDelay = 0f;
     private float spawnTimer = 0f;
     private boolean isSpawning = false;
-    Sound enemyDead_Sound = Gdx.audio.newSound(Gdx.files.internal("EnemyDeadSound.mp3"));
+    private Sound enemyDead_Sound;
 
-    // Сохраняем текстуру для правильной очистки
     private Texture spriteSheet;
 
     public Enemy(TextureRegion[] directionFrames, IMovementPattern pattern, float x, float y, int points) {
@@ -57,13 +53,22 @@ public class Enemy {
         this.position.set(x, y);
         this.prevPosition.set(x, y);
         this.currentFrame = directionFrames[0];
+        this.alive = true;
         bullets = new Array<>();
 
+        // Инициализация sprite для базового класса
+        sprite = new Sprite(directionFrames[0]);
+        sprite.setSize(width, height);
+        sprite.setPosition(x, y);
+
+        // Загрузка ресурсов
+        enemyDead_Sound = Gdx.audio.newSound(Gdx.files.internal("EnemyDeadSound.mp3"));
         spriteSheet = new Texture("ВеселаяНарезка.png");
         spriteSheet.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         bulletTexture = new TextureRegion(spriteSheet, 312, 139, 4, 9);
 
+        // Инициализация анимации смерти
         TextureRegion[] frames = new TextureRegion[5];
         int startX = 290;
         int startY = 2;
@@ -72,18 +77,16 @@ public class Enemy {
         int frameCount = 5;
         int frameOffset = 34;
 
-        // Используем одну текстуру для всех кадров
         for (int i = 0; i < frameCount; i++) {
             int SpryteX = startX + i * frameOffset;
             frames[i] = new TextureRegion(spriteSheet, SpryteX, startY, frameWidth, frameHeight);
         }
 
-        // Создаём анимацию с длительностью 0.1 секунды на кадр
         deadAnimation = new Animation<>(0.1f, frames);
     }
 
+    @Override
     public void update(float delta) {
-
         if (isSpawning) {
             spawnTimer += delta;
             if (spawnTimer < spawnDelay) {
@@ -96,18 +99,19 @@ public class Enemy {
         if (isDead) {
             stateTime += delta;
             if (deadAnimation.isAnimationFinished(stateTime)) {
-                active = false;
+                alive = false;
                 isReallyDead = true;
             }
             return;
         }
 
-        if (!active)
+        if (!alive)
             return;
 
         time += delta;
         prevPosition.set(position);
 
+        // Получаем новую позицию из паттерна движения
         Vector2 newPos;
         if (pattern instanceof com.kursch.patterns.FormationEntryPattern) {
             newPos = pattern.getPosition(com.kursch.patterns.FormationEntryPattern.getGlobalGameTime());
@@ -118,10 +122,14 @@ public class Enemy {
         }
         position.set(newPos);
 
+        // Синхронизируем sprite с position
+        sprite.setPosition(position.x, position.y);
+
         if (!inFormation && pattern.isComplete(time)) {
             inFormation = true;
         }
 
+        // Обновление направления для анимации
         float dx = position.x - prevPosition.x;
         float dy = position.y - prevPosition.y;
 
@@ -133,22 +141,22 @@ public class Enemy {
         }
 
         currentFrame = getFrameForDirection(smoothDirection.x, smoothDirection.y);
+        sprite.setRegion(currentFrame);
 
+        // Обновляем пули
         for (Bullet b : bullets) {
             b.update(delta);
         }
     }
 
+    @Override
     public void draw(SpriteBatch batch) {
         if (isDead) {
-            // Используем false для loop, чтобы анимация не повторялась
             TextureRegion frame = deadAnimation.getKeyFrame(stateTime, false);
 
-            // ИСПРАВЛЕНИЕ: Увеличиваем размер анимации смерти
-            float deathWidth = width * 1.5f; // Увеличиваем в 1.5 раза
+            float deathWidth = width * 1.5f;
             float deathHeight = height * 1.5f;
 
-            // Центрируем увеличенную анимацию
             float offsetX = (width - deathWidth) / 2f;
             float offsetY = (height - deathHeight) / 2f;
 
@@ -157,8 +165,8 @@ public class Enemy {
                     position.y + offsetY,
                     deathWidth,
                     deathHeight);
-        } else if (active) {
-            batch.draw(currentFrame, position.x, position.y, width, height);
+        } else if (alive) {
+            sprite.draw(batch);
         }
 
         for (Bullet b : bullets) {
@@ -167,58 +175,54 @@ public class Enemy {
     }
 
     private TextureRegion getFrameForDirection(float dx, float dy) {
-        // Обновляем таймер анимации крыльев
         animationTimer += Gdx.graphics.getDeltaTime();
         if (animationTimer >= animationSpeed) {
             animIndex = (animIndex + 1) % 2;
             animationTimer = 0f;
         }
 
-        // Если почти не двигается
         if (Math.abs(dx) < 0.1f && Math.abs(dy) < 0.5f) {
             return directionFrames[0 + animIndex];
         }
 
-        // Вычисляем угол направления в градусах (0° = вправо, 90° = вверх)
         float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
         if (angle < 0)
             angle += 360;
 
         int baseIndex;
 
-        // Определяем направление по секторам
         if (angle >= 75 && angle < 105) {
-            baseIndex = 0; // вверх
+            baseIndex = 0;
         } else if (angle >= 255 && angle < 285) {
-            baseIndex = 2; // вниз
+            baseIndex = 2;
         } else if (angle >= 165 && angle < 195) {
-            baseIndex = 8; // полностью влево
+            baseIndex = 8;
         } else if (angle >= 120 && angle < 150) {
-            baseIndex = 6; // влево средне (верх)
+            baseIndex = 6;
         } else if (angle >= 105 && angle < 120) {
-            baseIndex = 4; // влево слабо (верх)
+            baseIndex = 4;
         } else if (angle >= 210 && angle < 240) {
-            baseIndex = 18; // влево средне (низ)
+            baseIndex = 18;
         } else if (angle >= 240 && angle < 255) {
-            baseIndex = 16; // влево слабо (низ)
+            baseIndex = 16;
         } else if (angle >= 195 && angle < 210) {
-            baseIndex = 20; // полностью влево (низ)
+            baseIndex = 20;
         } else if (angle >= 345 || angle < 15) {
-            baseIndex = 14; // полностью вправо
+            baseIndex = 14;
         } else if (angle >= 30 && angle < 60) {
-            baseIndex = 12; // вправо средне (верх)
+            baseIndex = 12;
         } else if (angle >= 60 && angle < 75) {
-            baseIndex = 10; // вправо слабо (верх)
+            baseIndex = 10;
         } else if (angle >= 300 && angle < 330) {
-            baseIndex = 24; // вправо средне (низ)
+            baseIndex = 24;
         } else if (angle >= 285 && angle < 300) {
-            baseIndex = 22; // вправо слабо (низ)
+            baseIndex = 22;
         } else if (angle >= 330 && angle < 345) {
-            baseIndex = 26; // полностью вправо (низ)
+            baseIndex = 26;
         } else if (angle >= 15 && angle < 30) {
-            baseIndex = 14; // вправо
+            baseIndex = 14;
         } else if (angle >= 150 && angle < 165) {
-            baseIndex = 8; // влево
+            baseIndex = 8;
         } else {
             baseIndex = 0;
         }
@@ -226,25 +230,37 @@ public class Enemy {
         return directionFrames[baseIndex + animIndex];
     }
 
+    @Override
     public Rectangle getBounds() {
-        // ИСПРАВЛЕНИЕ: Не возвращаем коллизию для мёртвых врагов
         if (isDead || isReallyDead) {
-            return new Rectangle(0, 0, 0, 0); // Пустой прямоугольник
+            return new Rectangle(0, 0, 0, 0);
         }
         return new Rectangle(position.x, position.y, width, height);
     }
 
+    @Override
+    public Vector2 getPosition() {
+        return new Vector2(position.x, position.y);
+    }
+
+    @Override
+    public void setPosition(float x, float y) {
+        position.set(x, y);
+        if (sprite != null) {
+            sprite.setPosition(x, y);
+        }
+    }
+
     public void destroy() {
-        // ИСПРАВЛЕНИЕ: Проверяем что враг ещё не начал умирать
         if (isDead || isReallyDead) {
-            return; // Игнорируем повторные вызовы
+            return;
         }
 
         if (enemyDead_Sound != null) {
             enemyDead_Sound.play();
         }
         isDead = true;
-        stateTime = 0f; // сбрасываем время, чтобы анимация шла с начала
+        stateTime = 0f;
     }
 
     public void setBaseFrame() {
@@ -252,22 +268,22 @@ public class Enemy {
         animIndex = 0;
         animationTimer = 0f;
         currentFrame = directionFrames[0];
+        if (sprite != null) {
+            sprite.setRegion(currentFrame);
+        }
     }
 
     public void shooting(Player player) {
         Sprite bulletSprite = new Sprite(bulletTexture);
         bulletSprite.setSize(10, 25);
 
-        // Початкова позиція кулі — центр ворога
         float startX = position.x + width / 2f - bulletSprite.getWidth() / 2f;
         float startY = position.y + height / 2f - bulletSprite.getHeight() / 2f;
 
-        // Вектор напрямку від ворога до гравця
         Vector2 direction = new Vector2(
                 player.getPosition().x - position.x,
-                player.getPosition().y - position.y).nor(); // нормалізація
+                player.getPosition().y - position.y).nor();
 
-        // Додаємо кулю з цим напрямком
         bullets.add(new Bullet(bulletSprite, startX, startY, direction, 600f));
     }
 
@@ -275,13 +291,10 @@ public class Enemy {
         this.pattern = newPattern;
         this.time = 0f;
         setBaseFrame();
-        // Если переходим в атаку - враг не в формации
+
         if (newPattern instanceof com.kursch.patterns.DiveAttackPattern) {
             this.inFormation = false;
-        }
-        // Если переходим в FormationEntryPattern или GalagaFormationPattern - враг
-        // атакует
-        else if (newPattern instanceof com.kursch.patterns.FormationEntryPattern
+        } else if (newPattern instanceof com.kursch.patterns.FormationEntryPattern
                 || newPattern instanceof com.kursch.patterns.GalagaFormationPattern
                 || newPattern instanceof com.kursch.patterns.LeftRightPattern) {
             this.inFormation = true;
@@ -290,6 +303,7 @@ public class Enemy {
         }
     }
 
+    // Геттеры и сеттеры
     public void setSpawnDelay(float delay) {
         this.spawnDelay = delay;
         this.spawnTimer = 0f;
@@ -324,16 +338,8 @@ public class Enemy {
         return isReallyDead;
     }
 
-    public boolean isActive() {
-        return active;
-    }
-
     public float getPhaseOffset() {
         return phaseOffset;
-    }
-
-    public Vector2 getPosition() {
-        return new Vector2(position.x, position.y);
     }
 
     public Array<Bullet> getEnemyBullets() {
@@ -352,8 +358,8 @@ public class Enemy {
         return pattern;
     }
 
+    @Override
     public void dispose() {
-        // Правильная очистка ресурсов
         if (spriteSheet != null) {
             spriteSheet.dispose();
         }

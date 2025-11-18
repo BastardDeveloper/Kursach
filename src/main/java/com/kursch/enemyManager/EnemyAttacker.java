@@ -36,7 +36,7 @@ public class EnemyAttacker {
     private void launchAttack(Player player, float speedMultiplier) {
         List<Enemy> formed = new ArrayList<>();
         for (Enemy e : enemies) {
-            if (e.isActive() && e.isInFormation())
+            if (e.isAlive() && e.isInFormation())
                 formed.add(e);
         }
 
