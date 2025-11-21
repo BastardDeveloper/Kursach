@@ -10,6 +10,7 @@ import com.kursch.entities.Player;
 import com.kursch.entities.enemyCollection.blueRed_Bazz_Enemy;
 import com.kursch.graphics.animation.AnimationManager;
 import com.kursch.menu.GameScreen;
+import com.kursch.utils.GameSpeedController;
 
 public class EnemyFactory {
 

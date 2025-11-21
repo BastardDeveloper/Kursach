@@ -1,11 +1,5 @@
 package com.kursch.entities;
 
-/* Таски
- * 1. Унести логику создание пуль и звука в другие класы.
- * 2. Унести логику анимации смерти в друой класс
- * 3. Почистить методы которые в родительском класе
- */
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
