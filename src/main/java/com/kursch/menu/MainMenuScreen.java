@@ -12,40 +12,52 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.kursch.Main;
 import com.kursch.graphics.Background;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.graphics.GL20;
 
 public class MainMenuScreen implements Screen {
     private final Stage stage;
     private final Skin skin;
     private final SpriteBatch batch;
+    private final Main game;
+    public float volume;
     Background background;
     private Music menuMusic;
 
     public MainMenuScreen(final Main game) {
-        batch = new SpriteBatch();
+        this.game = game;
+        batch = game.spriteBatch;
         background = new Background(game.viewport);
         stage = new Stage(game.viewport);
-        Gdx.input.setInputProcessor(stage);
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
         // Загружаем и настраиваем музыку
         menuMusic = Gdx.audio.newMusic(Gdx.files.internal("SaundMenu.mp3"));
         menuMusic.setLooping(true);
-        menuMusic.setVolume(0.5f); // Громкость от 0.0 до 1.0
+        menuMusic.setVolume(0.5f);
         menuMusic.play();
 
         Table table = new Table();
         table.setFillParent(true);
         stage.addActor(table);
+
         TextButton playButton = new TextButton("play", skin);
+        TextButton HighScoresButton = new TextButton("HighScores", skin);
         TextButton exitButton = new TextButton("Exit", skin);
         TextButton settingsButton = new TextButton("Settings", skin);
-        table.add(settingsButton).width(300).height(80).pad(20).row();
 
         settingsButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.setScreen(new SettingsScreen(game, menuMusic));
-                dispose();
+                game.setScreen(new SettingsScreen(game, menuMusic, MainMenuScreen.this));
+
+            }
+        });
+
+        HighScoresButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.setScreen(new HighScoresScreen(game, MainMenuScreen.this));
+
             }
         });
 
@@ -63,18 +75,32 @@ public class MainMenuScreen implements Screen {
                 Gdx.app.exit();
             }
         });
-
+        table.add(settingsButton).width(300).height(80).pad(20).row();
         table.add(playButton).width(300).height(80).pad(20).row();
+        table.add(HighScoresButton).width(300).height(80).row();
         table.add(exitButton).width(300).height(80).pad(20);
+
         resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
     @Override
+    public void show() {
+        Gdx.input.setInputProcessor(stage);
+        if (menuMusic != null && !menuMusic.isPlaying()) {
+            menuMusic.play();
+        }
+    }
+
+    @Override
     public void render(float delta) {
+        Gdx.gl.glClearColor(0.15f, 0.15f, 0.2f, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         batch.begin();
         background.update(delta, 200);
         background.draw(batch);
         batch.end();
+
         stage.act(delta);
         stage.draw();
     }
@@ -100,23 +126,12 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void hide() {
-        if (menuMusic != null) {
-            menuMusic.pause();
-        }
-    }
-
-    @Override
-    public void show() {
-        Gdx.input.setInputProcessor(stage);
-        if (menuMusic != null) {
-            menuMusic.play();
-        }
+        // НЕ останавливаем музыку при переходе в настройки
     }
 
     @Override
     public void dispose() {
         stage.dispose();
-        batch.dispose();
         skin.dispose();
         if (menuMusic != null) {
             menuMusic.dispose();

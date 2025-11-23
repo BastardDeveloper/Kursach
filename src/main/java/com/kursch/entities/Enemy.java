@@ -166,7 +166,7 @@ public class Enemy extends AGameObject {
             animationTimer = 0f;
         }
 
-        if (Math.abs(dx) < 0.1f && Math.abs(dy) < 0.5f) {
+        if (Math.abs(dx) < 0.2f && Math.abs(dy) < 0.2f) {
             return directionFrames[0 + animIndex];
         }
 

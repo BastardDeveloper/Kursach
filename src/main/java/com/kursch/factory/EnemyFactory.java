@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kursch.enemyManager.*;
 import com.kursch.entities.Enemy;
 import com.kursch.entities.Player;
-import com.kursch.entities.enemyCollection.blueRed_Bazz_Enemy;
 import com.kursch.graphics.animation.AnimationManager;
 import com.kursch.menu.GameScreen;
 import com.kursch.utils.GameSpeedController;

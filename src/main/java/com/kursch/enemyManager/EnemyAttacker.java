@@ -51,7 +51,7 @@ public class EnemyAttacker {
             Enemy e = formed.get(i);
             Vector2 start = new Vector2(e.getPosition());
             Vector2 target = new Vector2(player.getPosition());
-            e.setMovementPattern(new DiveAttackPattern(start, target, diveDuration / speedMultiplier));
+            e.setMovementPattern(new DiveAttackPattern(start, target, 20 / speedMultiplier));
             e.shooting(player);
         }
     }

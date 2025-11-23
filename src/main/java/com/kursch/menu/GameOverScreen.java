@@ -12,8 +12,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.kursch.Main;
+import com.kursch.utils.HighScoreManager;
 
 public class GameOverScreen implements Screen {
     private final Stage stage;
@@ -26,10 +28,19 @@ public class GameOverScreen implements Screen {
     private boolean fadingIn = true;
 
     private final GameScreen previousScreen;
+    private final HighScoreManager highScoreManager;
+    private final int finalScore;
+    private boolean isHighScore;
+
+    private TextField nameField;
+    private TextButton submitButton;
+    private Table mainTable;
 
     public GameOverScreen(final Main game, GameScreen previousScreen, int score) {
 
         this.previousScreen = previousScreen;
+        this.highScoreManager = new HighScoreManager();
+        this.finalScore = score;
 
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
@@ -40,10 +51,78 @@ public class GameOverScreen implements Screen {
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
+        // Проверяем, является ли счет рекордом
+        isHighScore = highScoreManager.isHighScore(score);
+
         // Создаем главную таблицу
-        Table mainTable = new Table();
+        mainTable = new Table();
         mainTable.setFillParent(true);
         stage.addActor(mainTable);
+
+        if (isHighScore) {
+            showNameInputScreen(game);
+        } else {
+            showFinalScreen(game, "Player", false, 0);
+        }
+
+        resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    }
+
+    private void showNameInputScreen(final Main game) {
+        mainTable.clear();
+
+        // Заголовок
+        Label.LabelStyle titleStyle = new Label.LabelStyle(skin.getFont("default-font"), Color.GOLD);
+        Label titleLabel = new Label("NEW HIGH SCORE!", titleStyle);
+        titleLabel.setFontScale(2.5f);
+
+        // Счет
+        Label.LabelStyle scoreStyle = new Label.LabelStyle(skin.getFont("default-font"), Color.WHITE);
+        Label scoreLabel = new Label("Score: " + finalScore, scoreStyle);
+        scoreLabel.setFontScale(2f);
+
+        // Инструкция
+        Label.LabelStyle instructionStyle = new Label.LabelStyle(skin.getFont("default-font"), Color.LIGHT_GRAY);
+        Label instructionLabel = new Label("Enter your name:", instructionStyle);
+        instructionLabel.setFontScale(1.3f);
+
+        // Поле ввода
+        nameField = new TextField("", skin);
+        nameField.setMaxLength(15);
+        nameField.setMessageText("Your Name");
+
+        // Кнопка подтверждения
+        submitButton = new TextButton("Submit", skin);
+        submitButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                String playerName = nameField.getText().trim();
+                if (playerName.isEmpty()) {
+                    playerName = "Player";
+                }
+
+                // Сохраняем рекорд
+                highScoreManager.addScore(playerName, finalScore);
+                int rank = highScoreManager.getScoreRank(playerName, finalScore);
+
+                // Показываем финальный экран
+                showFinalScreen(game, playerName, true, rank);
+            }
+        });
+
+        // Компоновка
+        mainTable.add(titleLabel).padBottom(30).row();
+        mainTable.add(scoreLabel).padBottom(50).row();
+        mainTable.add(instructionLabel).padBottom(20).row();
+        mainTable.add(nameField).width(400).height(60).padBottom(30).row();
+        mainTable.add(submitButton).width(300).height(80);
+
+        // Устанавливаем фокус на поле ввода
+        stage.setKeyboardFocus(nameField);
+    }
+
+    private void showFinalScreen(final Main game, String playerName, boolean wasHighScore, int rank) {
+        mainTable.clear();
 
         // Заголовок Game Over
         Label.LabelStyle titleStyle = new Label.LabelStyle(skin.getFont("default-font"), Color.RED);
@@ -52,11 +131,20 @@ public class GameOverScreen implements Screen {
 
         // Счет
         Label.LabelStyle scoreStyle = new Label.LabelStyle(skin.getFont("default-font"), Color.WHITE);
-        Label scoreLabel = new Label("Score: " + score, scoreStyle);
+        Label scoreLabel = new Label("Score: " + finalScore, scoreStyle);
         scoreLabel.setFontScale(2f);
+
+        // Сообщение о рекорде
+        Label highScoreLabel = null;
+        if (wasHighScore && rank > 0) {
+            Label.LabelStyle highScoreStyle = new Label.LabelStyle(skin.getFont("default-font"), Color.YELLOW);
+            highScoreLabel = new Label(playerName + " - Rank #" + rank, highScoreStyle);
+            highScoreLabel.setFontScale(1.5f);
+        }
 
         // Кнопки
         TextButton restartButton = new TextButton("Restart", skin);
+        TextButton highScoresButton = new TextButton("High Scores", skin);
         TextButton menuButton = new TextButton("Main Menu", skin);
         TextButton exitButton = new TextButton("Exit", skin);
 
@@ -66,6 +154,13 @@ public class GameOverScreen implements Screen {
             public void changed(ChangeEvent event, Actor actor) {
                 game.setScreen(new GameScreen(game));
                 dispose();
+            }
+        });
+
+        highScoresButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.setScreen(new HighScoresScreen(game, GameOverScreen.this));
             }
         });
 
@@ -86,12 +181,18 @@ public class GameOverScreen implements Screen {
 
         // Компоновка элементов
         mainTable.add(titleLabel).padBottom(40).row();
-        mainTable.add(scoreLabel).padBottom(60).row();
-        mainTable.add(restartButton).width(300).height(80).pad(15).row();
-        mainTable.add(menuButton).width(300).height(80).pad(15).row();
-        mainTable.add(exitButton).width(300).height(80).pad(15);
+        mainTable.add(scoreLabel).padBottom(20).row();
 
-        resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        if (highScoreLabel != null) {
+            mainTable.add(highScoreLabel).padBottom(40).row();
+        } else {
+            mainTable.add().padBottom(40).row();
+        }
+
+        mainTable.add(restartButton).width(300).height(80).pad(10).row();
+        mainTable.add(highScoresButton).width(300).height(80).pad(10).row();
+        mainTable.add(menuButton).width(300).height(80).pad(10).row();
+        mainTable.add(exitButton).width(300).height(80).pad(10);
     }
 
     @Override

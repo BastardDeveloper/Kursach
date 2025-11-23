@@ -17,7 +17,7 @@ public class EnemyReturnHandler {
     private final FitViewport viewport;
     private final Map<Enemy, Float> pendingReturnTimers = new HashMap<>();
 
-    private final float entryDuration = 5f;
+    private final float entryDuration = 7f;
     private final float formationY = 700f;
     private final int formationCols = 8;
     private final int formationRows = 2;

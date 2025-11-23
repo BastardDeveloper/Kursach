@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kursch.entities.Enemy;
 import com.kursch.entities.Player;
 import com.kursch.entities.enemyCollection.blueRed_Bazz_Enemy;
+import com.kursch.entities.enemyCollection.yellowBlue_Bazz_Enemy;
 import com.kursch.patterns.CurvedTurnFormationPattern;
 import com.kursch.graphics.animation.AnimationManager;
 
@@ -90,20 +91,35 @@ public class EnemySpawner {
             float enemyStartY = startY - i * chainSpacing;
             float spawnDelay = i * 0.15f;
 
-            float phaseShift = (col % 2) * MathUtils.PI; // Альтернирующий сдвиг по колоннам
+            float phaseShift = (col % 2) * MathUtils.PI;
 
-            Enemy newE = new blueRed_Bazz_Enemy(
-                    new CurvedTurnFormationPattern(
-                            new Vector2(enemyStartX, enemyStartY),
-                            player.getPosition(),
-                            new Vector2(targetX, targetY),
-                            (entryDuration + spawnDelay) / speedMultiplier,
-                            150f,
-                            direction),
-                    enemyStartX, enemyStartY, animationManager);
+            // Рандомный выбор типа врага
+            Enemy newE;
+            if (random.nextBoolean()) {
+                newE = new blueRed_Bazz_Enemy(
+                        new CurvedTurnFormationPattern(
+                                new Vector2(enemyStartX, enemyStartY),
+                                player.getPosition(),
+                                new Vector2(targetX, targetY),
+                                (entryDuration + spawnDelay) / speedMultiplier,
+                                150f,
+                                direction),
+                        enemyStartX, enemyStartY, animationManager);
+            } else {
+                newE = new yellowBlue_Bazz_Enemy(
+                        new CurvedTurnFormationPattern(
+                                new Vector2(enemyStartX, enemyStartY),
+                                player.getPosition(),
+                                new Vector2(targetX, targetY),
+                                (entryDuration + spawnDelay) / speedMultiplier,
+                                150f,
+                                direction),
+                        enemyStartX, enemyStartY, animationManager);
+            }
+
             newE.setSpawnDelay(spawnDelay);
             newE.setAssignedSlot(cell);
-            newE.setPhaseOffset(phaseShift); // Устанавливаем фазовый сдвиг
+            newE.setPhaseOffset(phaseShift);
 
             enemies.add(newE);
             reservedMap.put(newE, cell);

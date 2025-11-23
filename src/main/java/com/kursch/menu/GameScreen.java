@@ -73,11 +73,7 @@ public class GameScreen implements Screen {
         // Обработка паузы клавишей ESC
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) && !gameOver) {
             paused = !paused;
-            if (paused && gameMusic != null) {
-                gameMusic.pause();
-            } else if (!paused && gameMusic != null) {
-                gameMusic.play();
-            }
+
         }
 
         // Плавное увеличение громкости музыки
@@ -131,8 +127,9 @@ public class GameScreen implements Screen {
         float centerY = game.viewport.getWorldHeight() / 2;
 
         pauseFont.getData().setScale(5f);
-        pauseFont.draw(game.spriteBatch, "PAUSE", centerX - 300, centerY + 120);
-        pauseFont.draw(game.spriteBatch, "ESC - Continue", centerX - 300, centerY + 40);
+        pauseFont.draw(game.spriteBatch, "PAUSE", centerX / 2, centerY + 270);
+        pauseFont.draw(game.spriteBatch, "S - Setting", centerX - 305, centerY + 130);
+        pauseFont.draw(game.spriteBatch, "ESC - Continue", centerX - 300, centerY + 45);
         pauseFont.draw(game.spriteBatch, "M - Main Menu", centerX - 300, centerY - 40);
 
         game.spriteBatch.end();
@@ -144,6 +141,14 @@ public class GameScreen implements Screen {
             game.setScreen(new MainMenuScreen(game));
             dispose();
         }
+
+        // Проверка клавиш для настроек
+        if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
+            if (gameMusic != null)
+                game.setScreen(new SettingsScreen(game, gameMusic, GameScreen.this));
+
+        }
+
     }
 
     @Override
@@ -165,8 +170,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
-        if (gameMusic != null)
-            gameMusic.pause();
     }
 
     @Override
