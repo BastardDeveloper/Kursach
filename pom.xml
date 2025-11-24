@@ -13,7 +13,7 @@
         <maven.compiler.source>23</maven.compiler.source>
         <maven.compiler.target>23</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <libgdx.version>1.13.5</libgdx.version>
+        <libgdx.version>1.14.0</libgdx.version>
         <javacv.version>1.5.10</javacv.version>
     </properties>
 
@@ -41,77 +41,7 @@
             <classifier>natives-desktop</classifier>
         </dependency>
 
-        <!-- Box2D Physics -->
-        <dependency>
-            <groupId>com.badlogicgames.gdx</groupId>
-            <artifactId>gdx-box2d</artifactId>
-            <version>${libgdx.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.badlogicgames.gdx</groupId>
-            <artifactId>gdx-box2d-platform</artifactId>
-            <version>${libgdx.version}</version>
-            <classifier>natives-desktop</classifier>
-        </dependency>
-
-        <!-- Bullet Physics -->
-        <dependency>
-            <groupId>com.badlogicgames.gdx</groupId>
-            <artifactId>gdx-bullet</artifactId>
-            <version>${libgdx.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.badlogicgames.gdx</groupId>
-            <artifactId>gdx-bullet-platform</artifactId>
-            <version>${libgdx.version}</version>
-            <classifier>natives-desktop</classifier>
-        </dependency>
-
-        <!-- FreeType font rendering -->
-        <dependency>
-            <groupId>com.badlogicgames.gdx</groupId>
-            <artifactId>gdx-freetype</artifactId>
-            <version>${libgdx.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.badlogicgames.gdx</groupId>
-            <artifactId>gdx-freetype-platform</artifactId>
-            <version>${libgdx.version}</version>
-            <classifier>natives-desktop</classifier>
-        </dependency>
-
-        <!-- SLF4J + Logback -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>2.0.17</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.5.19</version>
-        </dependency>
-
-        <!-- Testing -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>6.0.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-launcher</artifactId>
-            <version>6.0.0</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>3.27.6</version>
-            <scope>test</scope>
-        </dependency>
+        
     </dependencies>
 
     <build>
@@ -119,10 +49,12 @@
             <!-- Compiler plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.5</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
                 <configuration>
-                    <testFailureIgnore>true</testFailureIgnore>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
 
@@ -138,6 +70,83 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <!-- Фильтры для исключения ненужных файлов -->
+                            <filters>
+                                <!-- Общие исключения -->
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>META-INF/*.MF</exclude>
+                                        <exclude>META-INF/versions/**</exclude>
+                                        <exclude>META-INF/*.module-info</exclude>
+                                    </excludes>
+                                </filter>
+
+                                <filter>
+                                    <artifact>org.lwjgl:lwjgl</artifact>
+                                    <excludes>
+                                        <exclude>**/*natives-linux*</exclude>
+                                        <exclude>**/*natives-macos*</exclude>
+                                    </excludes>
+                                </filter>
+
+                                <filter>
+                                    <artifact>org.lwjgl:lwjgl-glfw</artifact>
+                                    <excludes>
+                                        <exclude>**/*natives-linux*</exclude>
+                                        <exclude>**/*natives-macos*</exclude>
+                                    </excludes>
+                                </filter>
+
+                                <filter>
+                                    <artifact>org.lwjgl:lwjgl-openal</artifact>
+                                    <excludes>
+                                        <exclude>**/*natives-linux*</exclude>
+                                        <exclude>**/*natives-macos*</exclude>
+                                    </excludes>
+                                </filter>
+
+                                <filter>
+                                <artifact>org.lwjgl:lwjgl:natives-linux</artifact>
+                                <excludes>
+                                    <exclude>**/*</exclude>
+                                </excludes>
+                            </filter>
+
+                                <filter>
+                                    <artifact>org.lwjgl:lwjgl:natives-linux-arm32</artifact>
+                                    <excludes>
+                                        <exclude>**/*</exclude>
+                                    </excludes>
+                                </filter>
+
+                                <filter>
+                                    <artifact>org.lwjgl:lwjgl:natives-linux-arm64</artifact>
+                                    <excludes>
+                                        <exclude>**/*</exclude>
+                                    </excludes>
+                                </filter>
+
+                                <filter>
+                                    <artifact>org.lwjgl:lwjgl:natives-macos</artifact>
+                                    <excludes>
+                                        <exclude>**/*</exclude>
+                                    </excludes>
+                                </filter>
+
+                                <filter>
+                                    <artifact>org.lwjgl:lwjgl:natives-macos-arm64</artifact>
+                                    <excludes>
+                                        <exclude>**/*</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+
+
+                            <!-- Трансформеры -->
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.kursch.DesktopLauncher</mainClass>
@@ -152,6 +161,7 @@
             </plugin>
         </plugins>
     </build>
+
 
     <repositories>
         <repository>

@@ -80,7 +80,7 @@ public class Player extends AGameObject {
         float startY = sprite.getY() + sprite.getHeight();
         Vector2 direction = new Vector2(0, 1); // напрям тільки вгору
 
-        Sound bulletSound = Gdx.audio.newSound(Gdx.files.internal("BulletSound.mp3"));
+        Sound bulletSound = Gdx.audio.newSound(Gdx.files.internal("assets/BulletSound.mp3"));
         Bullet.loadSound(bulletSound);
 
         bullets.add(new Bullet(bulletSprite, startX, startY, direction, 2000f));

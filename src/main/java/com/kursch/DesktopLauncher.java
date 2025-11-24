@@ -10,7 +10,7 @@ public class DesktopLauncher {
 
         config.setTitle("My Game");
         config.setWindowedMode(1000, 700);
-        config.setWindowIcon(Files.FileType.Internal, "icon.png");
+        config.setWindowIcon(Files.FileType.Internal, "assets/icon.png");
 
         new Lwjgl3Application(new Main(), config);
     }
