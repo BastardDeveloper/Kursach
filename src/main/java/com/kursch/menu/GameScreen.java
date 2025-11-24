@@ -41,7 +41,7 @@ public class GameScreen implements Screen {
 
         shapeRenderer = new ShapeRenderer();
 
-        gameMusic = Gdx.audio.newMusic(Gdx.files.internal("SaundForGame.mp3"));
+        gameMusic = Gdx.audio.newMusic(Gdx.files.internal("assets/SaundForGame.mp3"));
         gameMusic.setLooping(true);
         gameMusic.setVolume(0f);
 

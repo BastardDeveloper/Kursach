@@ -16,9 +16,9 @@ public class Background {
     public Background(FitViewport viewport) {
         this.viewport = viewport;
         textures = new Texture[] {
-                new Texture("bg1.png"),
-                new Texture("bg2.png"),
-                new Texture("bg3.png")
+                new Texture("assets/bg1.png"),
+                new Texture("assets/bg2.png"),
+                new Texture("assets/bg3.png")
         };
     }
 

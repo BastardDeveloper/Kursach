@@ -49,7 +49,7 @@ public class GameOverScreen implements Screen {
 
         Gdx.input.setInputProcessor(stage);
 
-        skin = new Skin(Gdx.files.internal("uiskin.json"));
+        skin = new Skin(Gdx.files.internal("assets/uiskin.json"));
 
         // Проверяем, является ли счет рекордом
         isHighScore = highScoreManager.isHighScore(score);

@@ -10,7 +10,7 @@ public class AnimationManager {
     private ObjectMap<String, Animation<TextureRegion>> animations;
 
     public AnimationManager() {
-        spriteSheet = new Texture("ВеселаяНарезка.png");
+        spriteSheet = new Texture("assets/ВеселаяНарезка.png");
         spriteSheet.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         animations = new ObjectMap<>();
         loadAnimations();
@@ -18,10 +18,10 @@ public class AnimationManager {
 
     private void loadAnimations() {
         // Анимация смерти игрока
-        animations.put("player_death", createAnimation(146, 2, 30, 30, 4, 34, 0.2f));
+        animations.put("assets/player_death", createAnimation(146, 2, 30, 30, 4, 34, 0.2f));
 
         // Анимация смерти врага
-        animations.put("enemy_death", createAnimation(290, 2, 30, 30, 5, 34, 0.1f));
+        animations.put("assets/enemy_death", createAnimation(290, 2, 30, 30, 5, 34, 0.1f));
     }
 
     private Animation<TextureRegion> createAnimation(int startX, int startY, int frameWidth, int frameHeight,

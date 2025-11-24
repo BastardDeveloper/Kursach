@@ -28,10 +28,10 @@ public class MainMenuScreen implements Screen {
         batch = game.spriteBatch;
         background = new Background(game.viewport);
         stage = new Stage(game.viewport);
-        skin = new Skin(Gdx.files.internal("uiskin.json"));
+        skin = new Skin(Gdx.files.internal("assets/uiskin.json"));
 
         // Загружаем и настраиваем музыку
-        menuMusic = Gdx.audio.newMusic(Gdx.files.internal("SaundMenu.mp3"));
+        menuMusic = Gdx.audio.newMusic(Gdx.files.internal("assets/SaundMenu.mp3"));
         menuMusic.setLooping(true);
         menuMusic.setVolume(0.5f);
         menuMusic.play();

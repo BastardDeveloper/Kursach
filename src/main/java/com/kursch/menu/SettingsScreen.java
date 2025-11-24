@@ -28,7 +28,7 @@ public class SettingsScreen implements Screen {
         this.menuMusic = menuMusic;
         this.previousScreen = previousScreen;
         this.stage = new Stage(game.viewport);
-        this.skin = new Skin(Gdx.files.internal("uiskin.json"));
+        this.skin = new Skin(Gdx.files.internal("assets/uiskin.json"));
         this.shapeRenderer = new ShapeRenderer();
 
         Table table = new Table();

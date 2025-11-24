@@ -61,10 +61,10 @@ public class Enemy extends AGameObject {
         sprite.setPosition(x, y);
 
         // Загрузка звука
-        enemyDead_Sound = Gdx.audio.newSound(Gdx.files.internal("EnemyDeadSound.mp3"));
+        enemyDead_Sound = Gdx.audio.newSound(Gdx.files.internal("assets/EnemyDeadSound.mp3"));
 
         // Получение анимации смерти из AnimationManager
-        deadAnimation = animationManager.get("enemy_death");
+        deadAnimation = animationManager.get("assets/enemy_death");
 
         // Инициализация фабрики пуль
         bulletFactory = new BulletFactory(animationManager.getSpriteSheet());

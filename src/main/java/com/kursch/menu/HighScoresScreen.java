@@ -29,7 +29,7 @@ public class HighScoresScreen implements Screen {
         stage = new Stage(game.viewport, game.spriteBatch);
         Gdx.input.setInputProcessor(stage);
 
-        skin = new Skin(Gdx.files.internal("uiskin.json"));
+        skin = new Skin(Gdx.files.internal("assets/uiskin.json"));
 
         HighScoreManager highScoreManager = new HighScoreManager();
         List<HighScoreManager.HighScoreEntry> highScores = highScoreManager.getHighScores();

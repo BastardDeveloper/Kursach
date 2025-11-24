@@ -12,7 +12,7 @@ public class yellowBlue_Bazz_Enemy extends Enemy {
     private static Texture enemyAtlas;
 
     static {
-        Pixmap pixmap = new Pixmap(Gdx.files.internal("ВеселаяНарезка.png"));
+        Pixmap pixmap = new Pixmap(Gdx.files.internal("assets/ВеселаяНарезка.png"));
         enemyAtlas = new Texture(pixmap);
         pixmap.dispose();
         enemyAtlas.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);

@@ -27,6 +27,9 @@
                 <transformer>
                   <mainClass>com.kursch.DesktopLauncher</mainClass>
                 </transformer>
+                <transformer>
+                  <resource>META-INF/services/com.badlogic.gdx.files.FileHandleResolver</resource>
+                </transformer>
               </transformers>
             </configuration>
           </execution>

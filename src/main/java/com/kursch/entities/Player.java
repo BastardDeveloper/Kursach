@@ -30,10 +30,10 @@ public class Player extends AGameObject {
         this.viewport = viewport;
         this.lives = 3;
         this.gameScreen = gameScreen;
-        this.deathAnimation = animationManager.get("player_death");
+        this.deathAnimation = animationManager.get("assets/player_death");
 
-        sprite = new Sprite(new TextureRegion(new Texture("SpriteSheet1_Enemies.png"), 100, 78, 250, 250));
-        bulletTexture = new TextureRegion(new Texture("ВеселаяНарезка.png"), 312, 139, 4, 9);
+        sprite = new Sprite(new TextureRegion(new Texture("assets/SpriteSheet1_Enemies.png"), 100, 78, 250, 250));
+        bulletTexture = new TextureRegion(new Texture("assets/ВеселаяНарезка.png"), 312, 139, 4, 9);
         sprite.setPosition(viewport.getWorldWidth() / 2f - 17.5f, 20);
         sprite.setSize(35, 35);
         bullets = new Array<>();
