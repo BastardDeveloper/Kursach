@@ -2,6 +2,7 @@ baby:2400
 asdasd:1300
 BobbyS!12:700
 Bobby123:600
+Maktraher:500
 Player:400
 sadsadasd:300
 123:300
