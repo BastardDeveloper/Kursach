@@ -1,6 +1,8 @@
 {
   BitmapFont: { default-font: { file: default.fnt } },
   Color: {
+    purple: { r: 0.5, g: 0, b: 0.9, a: 1 },
+    purpleLight: { r: 0.7, g: 0.2, b: 1, a: 1 },
     green: { a: 1, b: 0, g: 1, r: 0 },
     white: { a: 1, b: 1, g: 1, r: 1 },
     red: { a: 1, b: 0, g: 0, r: 1 },
@@ -8,12 +10,23 @@
     gray: { a: 1, b: 0.8, g: 0.8, r: 0.8 },
   },
   TintedDrawable: {
-    dialogDim: { name: white, color: { r: 0, g: 0, b: 0, a: 0.45 } },
-  },
+  dialogDim: { name: white, color: { r: 0, g: 0, b: 0, a: 0.45 } },
+
+  buttonPurple: { name: default-round, color: purple },
+  buttonPurpleLight: { name: default-round, color: purpleLight }
+}
+
   ButtonStyle: {
-    default: { down: default-round-down, up: default-round, disabled: default-round },
-    toggle: { parent: default, checked: default-round-down },
+  default: {
+    up: buttonPurple,
+    down: default-round-down,
+    over: buttonPurpleLight,
+    disabled: default-round
   },
+
+  toggle: { parent: default, checked: default-round-down }
+}
+
   TextButtonStyle: {
     default: { parent: default, font: default-font, fontColor: white, disabledFontColor: gray },
     toggle: { parent: default, checked: default-round-down, downFontColor: red }
@@ -71,5 +84,5 @@
       label: { font: default-font, fontColor: white },
       background: default-pane, wrapWidth: 150
     }
-  },
+  }
 }

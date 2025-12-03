@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kursch.menu.MainMenuScreen;
 import com.kursch.entities.Player;
 import com.kursch.factory.EnemyFactory;
@@ -14,6 +15,10 @@ import com.kursch.menu.GameScreen;
 
 public class Main extends Game {
     public SpriteBatch spriteBatch;
+    // Основной viewport на весь экран (для UI по бокам)
+    public ScreenViewport uiViewport;
+
+    // Игровой viewport фиксированного размера (для игры)
     public FitViewport viewport;
 
     public Player player;
@@ -28,6 +33,7 @@ public class Main extends Game {
 
         spriteBatch = new SpriteBatch();
         viewport = new FitViewport(700, 1000);
+        uiViewport = new ScreenViewport();
         setScreen(new MainMenuScreen(this));
         background = new Background(viewport);
         gameScreen = new GameScreen(this);

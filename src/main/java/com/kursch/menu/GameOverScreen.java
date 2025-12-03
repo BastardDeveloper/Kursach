@@ -45,7 +45,7 @@ public class GameOverScreen implements Screen {
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
 
-        stage = new Stage(game.viewport, game.spriteBatch);
+        stage = new Stage(game.uiViewport, game.spriteBatch);
 
         Gdx.input.setInputProcessor(stage);
 

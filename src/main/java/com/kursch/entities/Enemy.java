@@ -1,5 +1,7 @@
 package com.kursch.entities;
 
+import java.util.LinkedList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -10,6 +12,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.kursch.patterns.IMovementPattern;
+import com.kursch.factory.BulletFactory;
 import com.kursch.graphics.animation.AnimationManager;
 
 public class Enemy extends AGameObject {
@@ -31,6 +34,8 @@ public class Enemy extends AGameObject {
     private Vector2 prevPosition = new Vector2();
     private float width = 40, height = 40;
     private float phaseOffset = 0f;
+    private Array<Float> scheduledShots = new Array<>();
+    private float shotTimer = 0f;
 
     private float animationTimer = 0f;
     private int animIndex = 0;
@@ -68,6 +73,17 @@ public class Enemy extends AGameObject {
 
         // Инициализация фабрики пуль
         bulletFactory = new BulletFactory(animationManager.getSpriteSheet());
+    }
+
+    public void updateShooting(float delta, Player player) {
+        if (scheduledShots.size > 0) {
+            shotTimer += delta;
+            if (shotTimer >= scheduledShots.first()) {
+                shooting(player);
+                scheduledShots.removeIndex(0);
+                shotTimer = 0f;
+            }
+        }
     }
 
     @Override
@@ -129,6 +145,7 @@ public class Enemy extends AGameObject {
         sprite.setRegion(currentFrame);
 
         // Обновляем пули
+
         for (Bullet b : bullets) {
             b.update(delta);
         }
@@ -236,6 +253,10 @@ public class Enemy extends AGameObject {
         }
     }
 
+    public void scheduleShot(float delay) {
+        scheduledShots.add(delay);
+    }
+
     public void destroy() {
         if (isDead || isReallyDead) {
             return;
@@ -259,7 +280,7 @@ public class Enemy extends AGameObject {
     }
 
     public void shooting(Player player) {
-        // Используем BulletFactory для создания пули
+
         Bullet bullet = bulletFactory.createEnemyBullet(
                 position,
                 width,

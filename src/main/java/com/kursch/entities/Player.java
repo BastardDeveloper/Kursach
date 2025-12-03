@@ -13,11 +13,14 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kursch.menu.GameScreen;
 import com.badlogic.gdx.audio.Sound;
+import com.kursch.entities.enemyCollection.blueRed_Bazz_Enemy;
+import com.kursch.factory.BulletFactory;
 import com.kursch.graphics.animation.AnimationManager;
 
 public class Player extends AGameObject {
 
     private Animation<TextureRegion> deathAnimation;
+    private BulletFactory bulletFactory;
     private int lives;
     private Array<Bullet> bullets;
     private TextureRegion bulletTexture;
@@ -37,6 +40,8 @@ public class Player extends AGameObject {
         sprite.setPosition(viewport.getWorldWidth() / 2f - 17.5f, 20);
         sprite.setSize(35, 35);
         bullets = new Array<>();
+        bulletFactory = new BulletFactory(animationManager.getSpriteSheet());
+
     }
 
     @Override
@@ -57,14 +62,9 @@ public class Player extends AGameObject {
             sprite.translateX(-speed);
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
             sprite.translateX(speed);
-        if (Gdx.input.isKeyPressed(Input.Keys.UP))
-            sprite.translateY(speed);
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
-            sprite.translateY(-speed);
 
         sprite.setX(MathUtils.clamp(sprite.getX(), 0, viewport.getWorldWidth() - sprite.getWidth()));
-        sprite
-                .setY(MathUtils.clamp(sprite.getY(), 0, viewport.getWorldHeight() - sprite.getHeight()));
+        sprite.setY(MathUtils.clamp(sprite.getY(), 0, viewport.getWorldHeight() - sprite.getHeight()));
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE))
             shoot();
@@ -74,16 +74,16 @@ public class Player extends AGameObject {
     }
 
     private void shoot() {
-        Sprite bulletSprite = new Sprite(bulletTexture);
-        bulletSprite.setSize(20, 37);
-        float startX = (sprite.getX() + (sprite.getWidth() - bulletSprite.getWidth()) / 2) - 4;
-        float startY = sprite.getY() + sprite.getHeight();
-        Vector2 direction = new Vector2(0, 1); // напрям тільки вгору
+        if (bullets.size < 2) {
 
-        Sound bulletSound = Gdx.audio.newSound(Gdx.files.internal("assets/BulletSound.mp3"));
-        Bullet.loadSound(bulletSound);
+            Vector2 direction = new Vector2(0, 1); // напрям тільки вгору
+            Bullet bullet = bulletFactory.createPlayerBullet(getPosition(), sprite.getWidth(), sprite.getHeight(),
+                    direction, 2000);
 
-        bullets.add(new Bullet(bulletSprite, startX, startY, direction, 2000f));
+            bullets.add(bullet);
+
+        }
+
     }
 
     @Override
@@ -109,6 +109,10 @@ public class Player extends AGameObject {
             alive = false;
 
         }
+    }
+
+    public int getLives() {
+        return lives;
     }
 
     public Array<Bullet> getPlayerBullets() {

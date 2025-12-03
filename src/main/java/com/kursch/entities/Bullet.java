@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 
 public class Bullet {
 
@@ -14,12 +13,6 @@ public class Bullet {
     private Vector2 velocity;
     private boolean active = true;
 
-    private static Sound shootSound;
-
-    public static void loadSound(Sound sound) {
-        shootSound = sound;
-    }
-
     public Bullet(Sprite bulletSprite, float startX, float startY, Vector2 direction, float speed) {
         this.bulletSprite = bulletSprite;
         this.position = new Vector2(startX, startY);
@@ -27,9 +20,6 @@ public class Bullet {
 
         this.bulletSprite.setPosition(startX, startY);
 
-        if (shootSound != null) {
-            shootSound.play(0.2f);
-        }
     }
 
     public void update(float delta) {
